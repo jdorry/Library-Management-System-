@@ -26,7 +26,7 @@ JPanel jp1,jp2,jp3,jp4,jp5,jp6;
  JTextField read1;
  FileWriter wr1;
 Container cp;
-
+int i;
 
 addBook(){
 	super("Add Book To Library");
