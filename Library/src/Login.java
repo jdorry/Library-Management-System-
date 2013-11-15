@@ -72,11 +72,7 @@ public class Login extends JApplet {
 			public void actionPerformed(ActionEvent e) {
 				if (textField.getText().equals("admin")
 						&& passwordField.getText().equals("admin")) {
-					Library lb = new Library();
-					// splash1 s=new splash1();
-					setVisible(false);
-					lb.setVisible(true);
-					lb.setSize(800, 600);
+					
 
 				} else {
 					lblPleaseCheckUsername.setVisible(true);
