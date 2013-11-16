@@ -791,7 +791,7 @@ public class LibraryApplet extends JApplet {
 
 		b15.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Addcust ad = new Addcust();
+				AddCustApplet ad = new AddCustApplet();
 				ad.setVisible(true);
 				ad.setSize(380, 400);
 				ad.setLocation(80, 140);
