@@ -49,7 +49,7 @@ public class LibraryApplet extends JApplet {
 	private JButton b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b15;
 	private JTextField t1, t2, t3, t14, read1, jt2;
 	private JPanel panel_1;
-	private JPanel panel_2;
+	private JPanel panel_2, panel;
 	FileWriter wr1;
 	String stra1 = "", name11 = "", publication11 = "", author11 = "",
 			name22 = "";
@@ -62,7 +62,7 @@ public class LibraryApplet extends JApplet {
 	 */
 	public LibraryApplet() {
 		
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		panel.setBackground(SystemColor.info);
 		getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
@@ -223,17 +223,18 @@ public class LibraryApplet extends JApplet {
 		panel.setVisible(true);
 		
 		try {
-			rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/pointer.mmm");
+			//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/pointer.mmm");
+			rd1 = new FileReader("Database/pointer.mmm");
 			read1 = new JTextField();
 			read1.read(rd1, null);
 			int count = Integer.parseInt(read1.getText());
 			int total = count - 1;
 			int blk = 0;
 			rd1.close();
-			b_no.setText("here");
 
 			for (int i = 1; i < count; i++) {
-				rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".name");
+				//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".name");
+				rd1 = new FileReader("Database/pointer.mmm" + i + ".name");
 				read1 = new JTextField();
 				read1.read(rd1, null);
 				if (!read1.getText().equals("")) {
@@ -245,19 +246,22 @@ public class LibraryApplet extends JApplet {
 					int per = i * 100 / total;
 					progress1.setValue(per);
 
-					rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".author");
+					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".author");
+					rd1 = new FileReader("Database/pointer.mmm" + i + ".author");
 					read1 = new JTextField();
 					read1.read(rd1, null);
 					mo2.addElement(read1.getText() + "");
 					rd1.close();
 
-					rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".publication");
+					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".publication");
+					rd1 = new FileReader("Database/pointer.mmm" + i + ".publication");
 					read1 = new JTextField();
 					read1.read(rd1, null);
 					mo3.addElement(read1.getText() + "");
 					rd1.close();
 
-					rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".issue");
+					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".issue");
+					rd1 = new FileReader("Database/pointer.mmm" + i + ".issue");
 					read1 = new JTextField();
 					read1.read(rd1, null);
 					if (!read1.getText().equals("")) {
@@ -267,13 +271,15 @@ public class LibraryApplet extends JApplet {
 					}
 					rd1.close();
 
-					rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".return");
+					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".return");
+					rd1 = new FileReader("Database/pointer.mmm" + i + ".return");
 					read1 = new JTextField();
 					read1.read(rd1, null);
 					mo5.addElement(read1.getText() + "");
 					rd1.close();
 
-					rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".id");
+					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".id");
+					rd1 = new FileReader("Database/pointer.mmm" + i + ".id");
 					read1 = new JTextField();
 					read1.read(rd1, null);
 					mo6.addElement(read1.getText() + "");
@@ -791,16 +797,30 @@ public class LibraryApplet extends JApplet {
 
 		b15.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				AddCustApplet ad = new AddCustApplet();
-				ad.setVisible(true);
-				ad.setSize(380, 400);
-				ad.setLocation(80, 140);
+				//Addcust ad = new Addcust();
+				//ad.setVisible(true);
+				//ad.setSize(380, 400);
+				//ad.setLocation(80, 140);
+				//LibraryApplet library = new LibraryApplet();
+				AddCustApplet aCA = new AddCustApplet();
+				aCA.init();
+				aCA.start();
+				panel.setVisible(false);
+				//setLayout(new BorderLayout(800, 600));
+				add("Center", aCA);
 			}
 		});
 		
 		b1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				addBook a = new addBook();
+				//addBook a = new addBook();
+				//LibraryApplet library = new LibraryApplet();
+				AddBookApplet aBA = new AddBookApplet();
+				aBA.init();
+				aBA.start();
+				panel.setVisible(false);
+				setLayout(new BorderLayout(800, 600));
+				add("Center", aBA);
 			}
 		});
 

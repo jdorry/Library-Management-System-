@@ -23,7 +23,7 @@ public class AddBookApplet extends JApplet {
 	JTextArea a1, a2, a3, a5, a4, a6, a7;
 	JButton b1, b2, b3, b4, b5, b6, b7, b8, b9, b10;
 	JLabel l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14;
-	JPanel jp1, jp2, jp3, jp4, jp5, jp6;
+	JPanel jp1, jp2, jp3, jp4, jp5, jp6, panel;
 	FileReader rd1;
 	JTextField read1;
 	FileWriter wr1;
@@ -37,7 +37,7 @@ public class AddBookApplet extends JApplet {
 	 */
 	public AddBookApplet() {
 		
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		panel.setBackground(SystemColor.activeCaptionBorder);
 		getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
@@ -172,7 +172,12 @@ public class AddBookApplet extends JApplet {
 
 		b3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
+				LibraryApplet library = new LibraryApplet();
+				library.init();
+				library.start();
+				panel.setVisible(false);
+				setLayout(new BorderLayout(800, 600));
+				add("Center", library);
 			}
 		});
 

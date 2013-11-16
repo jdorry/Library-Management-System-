@@ -37,7 +37,7 @@ public class AddCustApplet extends JApplet {
 	
 	public AddCustApplet() {
 		
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		panel.setBackground(SystemColor.activeCaptionBorder);
 		getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
@@ -173,7 +173,12 @@ public class AddCustApplet extends JApplet {
 
 		cancelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
+				LibraryApplet library = new LibraryApplet();
+				library.init();
+				library.start();
+				panel.setVisible(false);
+				setLayout(new BorderLayout(800, 600));
+				add("Center", library);
 			}
 		});
 
