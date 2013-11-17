@@ -67,8 +67,8 @@ public class Login extends JApplet {
 		
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if (textField.getText().equals("admin")
-						&& passwordField.getText().equals("admin")) {
+				//if (textField.getText().equals("admin")
+					//	&& passwordField.getText().equals("admin")) {
 					 //Library lb = new Library();
 					// splash1 s=new splash1();
 					 //setVisible(false);
@@ -83,10 +83,10 @@ public class Login extends JApplet {
 					add("Center", library);
 	 
 
-				} else {
-					lblPleaseCheckUsername.setVisible(true);
-					lblPleaseCheckUsername.setForeground(Color.red);
-				}
+				//} else {
+					//lblPleaseCheckUsername.setVisible(true);
+					//lblPleaseCheckUsername.setForeground(Color.red);
+				//}
 
 			}
 		});
