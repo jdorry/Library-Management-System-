@@ -87,8 +87,8 @@ public class LibraryApplet extends JApplet {
 		}
 		
 		try {
-			//con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
-			con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
+			con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			//con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
 			statement = (PreparedStatement) con.prepareStatement("select * from LibraryDB");
 			result = statement.executeQuery();
 		} catch (SQLException e1) {
@@ -263,7 +263,7 @@ public class LibraryApplet extends JApplet {
 			
 			while (result.next())
 			{
-				//System.out.println(result.getString(1));
+
 				mo1.addElement(result.getString(1));
 				bookNames.add(result.getString(1));
 				mo2.addElement(result.getString(2));
@@ -274,7 +274,7 @@ public class LibraryApplet extends JApplet {
 				issueDates.add(result.getString(4));
 				mo5.addElement(result.getString(5));
 				returnDates.add(result.getString(5));
-				mo6.addElement(result.getInt(6));
+				mo6.addElement(result.getString(6));
 				custIDs.add(result.getString(6));
 				bookCount++;
 			}
@@ -886,8 +886,11 @@ public class LibraryApplet extends JApplet {
 		b2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				int listIndex, arrayIndex, i;
+				int listIndex, arrayIndex, i, bookCount;
 				String removeBookName;
+				
+				arrayIndex = 0;
+				bookCount = 0;
 				
 				try {
 					
@@ -908,18 +911,37 @@ public class LibraryApplet extends JApplet {
 							arrayIndex = i;
 						}
 					}
+					//DELETE FROM Customers
+					//WHERE CustomerName='Alfreds Futterkiste' AND ContactName='Maria Anders';
+					String theStatement = "DELETE FROM LibraryDB" +
+					" WHERE bookname='" + bookNames.get(arrayIndex) + "' AND author='" + authors.get(arrayIndex) + "' AND " +
+					"publication='" + publications.get(arrayIndex) + "' AND issuedate='" + issueDates.get(arrayIndex) + "' AND " +
+					"returndate='" + returnDates.get(arrayIndex) + "' AND custid='" + custIDs.get(arrayIndex) + "'";
+					System.out.println(theStatement);
+					removeStatement = (PreparedStatement) con.prepareStatement(theStatement);
 					
-					//removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB")
 					
-					bookNames.remove(i);
-					authors.remove(i);
-					publications.remove(i);
-					issueDates.remove(i);
-					returnDates.remove(i);
-					custIDs.remove(i);
+					bookNames.remove(arrayIndex);
+					authors.remove(arrayIndex);
+					publications.remove(arrayIndex);
+					issueDates.remove(arrayIndex);
+					returnDates.remove(arrayIndex);
+					custIDs.remove(arrayIndex);
 					
+					removeStatement.executeUpdate();
+					
+					for(i = 0; i < bookNames.size(); i ++)
+					{
+						mo1.addElement(bookNames.get(i));
+						mo2.addElement(authors.get(i));
+						mo3.addElement(publications.get(i));
+						mo4.addElement(issueDates.get(i));
+						mo5.addElement(returnDates.get(i));
+						mo6.addElement(custIDs.get(i));
+						bookCount++;
+					}
+					b_no.setText("Total Books = " + bookCount + " (Book's)");
 				} catch (Exception fr) {
-					System.out.println(fr);
 				}
 
 			}

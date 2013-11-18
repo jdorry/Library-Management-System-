@@ -141,7 +141,7 @@ public class AddBookApplet extends JApplet {
 
 						PreparedStatement statement = null; 
 								statement = (PreparedStatement) con.prepareStatement("INSERT INTO " +
-										"LibraryDB(bookname, author, publication, issuedate, rturndate, custid) " +
+										"LibraryDB(bookname, author, publication, issuedate, returndate, custid) " +
 										"VALUES(?, ?, ?, ?, ?, ?)");
 						statement.setString(1, bookname);
 						statement.setString(2, author);
