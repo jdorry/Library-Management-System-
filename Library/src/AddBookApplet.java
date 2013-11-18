@@ -136,8 +136,8 @@ public class AddBookApplet extends JApplet {
 					try{
 						Class.forName("com.mysql.jdbc.Driver").newInstance();
 						
-						//Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
-						Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
+						Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+						//Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
 
 						PreparedStatement statement = null; 
 								statement = (PreparedStatement) con.prepareStatement("INSERT INTO " +

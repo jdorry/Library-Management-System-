@@ -280,7 +280,7 @@ public class LibraryApplet extends JApplet {
 			}
 			
 			b_no.setText("Total Books = " + bookCount + " (Book's)");
-			
+			statement.close();
 		} catch (Exception der) {
 			b_no.setText("Error Occurs: \n" + der);
 		}
@@ -913,13 +913,23 @@ public class LibraryApplet extends JApplet {
 					}
 					//DELETE FROM Customers
 					//WHERE CustomerName='Alfreds Futterkiste' AND ContactName='Maria Anders';
-					String theStatement = "DELETE FROM LibraryDB" +
-					" WHERE bookname='" + bookNames.get(arrayIndex) + "' AND author='" + authors.get(arrayIndex) + "' AND " +
-					"publication='" + publications.get(arrayIndex) + "' AND issuedate='" + issueDates.get(arrayIndex) + "' AND " +
-					"returndate='" + returnDates.get(arrayIndex) + "' AND custid='" + custIDs.get(arrayIndex) + "'";
-					System.out.println(theStatement);
-					removeStatement = (PreparedStatement) con.prepareStatement(theStatement);
+					//String theStatement = "DELETE FROM LibraryDB" +
+					//" WHERE bookname = '" + bookNames.get(arrayIndex) + "' AND author = '" + authors.get(arrayIndex) + "' AND " +
+					//"publication = '" + publications.get(arrayIndex) + "' AND issuedate = '" + issueDates.get(arrayIndex) + "' AND " +
+					//"returndate = '" + returnDates.get(arrayIndex) + "' AND custid = '" + custIDs.get(arrayIndex) + "'";
+					//System.out.println(theStatement);
+					//removeStatement = (PreparedStatement) con.prepareStatement(theStatement);
+					removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB WHERE bookname = ? " +
+					"AND author = ? AND publication = ? AND issuedate = ? AND returndate = ? AND custid = ?");
 					
+					removeStatement.setString(1, (String) bookNames.get(arrayIndex));
+					removeStatement.setString(2, (String) authors.get(arrayIndex));
+					removeStatement.setString(3, (String) publications.get(arrayIndex));
+					removeStatement.setString(4, (String) issueDates.get(arrayIndex));
+					removeStatement.setString(5, (String) returnDates.get(arrayIndex));
+					removeStatement.setString(6, (String) custIDs.get(arrayIndex));
+					
+					removeStatement.executeUpdate();
 					
 					bookNames.remove(arrayIndex);
 					authors.remove(arrayIndex);
@@ -927,8 +937,6 @@ public class LibraryApplet extends JApplet {
 					issueDates.remove(arrayIndex);
 					returnDates.remove(arrayIndex);
 					custIDs.remove(arrayIndex);
-					
-					removeStatement.executeUpdate();
 					
 					for(i = 0; i < bookNames.size(); i ++)
 					{
