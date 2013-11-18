@@ -935,11 +935,7 @@ public class LibraryApplet extends JApplet {
 						removeStatement.setString(5, (String) returnDates.get(arrayIndex));
 						removeStatement.setString(6, (String) custIDs.get(arrayIndex));
 						
-						
-						
 						deleteSuccess = removeStatement.executeUpdate();
-					
-						System.out.println(deleteSuccess);
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();

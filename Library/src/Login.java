@@ -113,11 +113,6 @@ public class Login extends JApplet {
 				
 				
 				if (userMatch) {
-					 //Library lb = new Library();
-					// splash1 s=new splash1();
-					 //setVisible(false);
-					 //lb.setVisible(true);
-					// lb.setSize(800, 600);
 					
 					LibraryApplet library = new LibraryApplet();
 					library.init();
@@ -125,7 +120,6 @@ public class Login extends JApplet {
 					panel.setVisible(false);
 					setLayout(new BorderLayout(800, 600));
 					add("Center", library);
-	 
 
 				} else {
 					lblPleaseCheckUsername.setVisible(true);

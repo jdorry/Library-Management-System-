@@ -141,7 +141,7 @@ public class AddBookApplet extends JApplet {
 
 						PreparedStatement statement = null; 
 								statement = (PreparedStatement) con.prepareStatement("INSERT INTO " +
-										"LibraryDB(bookname, author, publication, issuedate, returndate, custid) " +
+										"LibraryDB(bookname, author, publication, issuedate, rturndate, custid) " +
 										"VALUES(?, ?, ?, ?, ?, ?)");
 						statement.setString(1, bookname);
 						statement.setString(2, author);
@@ -150,6 +150,15 @@ public class AddBookApplet extends JApplet {
 						statement.setString(5, retDate);
 						statement.setString(6, custid);
 						statement.executeUpdate();
+						statement.close();
+						con.close();
+						
+						LibraryApplet library = new LibraryApplet();
+						library.init();
+						library.start();
+						panel.setVisible(false);
+						setLayout(new BorderLayout(800, 600));
+						add("Center", library);
 						
 					}
 					catch (SQLException e1){
@@ -161,47 +170,7 @@ public class AddBookApplet extends JApplet {
 					} catch (ClassNotFoundException e1) {
 						e1.printStackTrace();
 					}
-					/* rd1 = new FileReader("Database/pointer.mmm");
-					read1 = new JTextField();
-					read1.read(rd1, null);
-					int count2 = Integer.parseInt(read1.getText());
-					rd1.close();
-
-					wr1 = new FileWriter("Database/" + count2 + ".name");
-					wr1.write(t1.getText() + "");
-					wr1.close();
-
-					wr1 = new FileWriter("Database/" + count2 + ".author");
-					wr1.write(t2.getText() + "");
-					wr1.close();
-
-					wr1 = new FileWriter("Database/" + count2 + ".publication");
-					wr1.write(t3.getText() + "");
-					wr1.close();
-
-					wr1 = new FileWriter("Database/" + count2 + ".issue");
-					wr1.write(t4.getText() + "");
-					wr1.close();
-
-					wr1 = new FileWriter("Database/" + count2 + ".return");
-					wr1.write("00/00/00");
-					wr1.close();
-
-					wr1 = new FileWriter("Database/" + count2 + ".detail");
-					wr1.write(textField_4.getText() + "");
-					wr1.close();
-
-					wr1 = new FileWriter("Database/" + count2 + ".id");
-					wr1.write("0000");
-					wr1.close();
-
-					count2 = count2 + 1;
-
-					wr1 = new FileWriter("Database/pointer.mmm");
-					wr1.write(count2 + "");
-					wr1.close(); */
-
-					setVisible(false);
+					
 				} catch (Exception gr) {
 				}
 			}
