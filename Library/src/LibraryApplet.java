@@ -281,6 +281,7 @@ public class LibraryApplet extends JApplet {
 			
 			b_no.setText("Total Books = " + bookCount + " (Book's)");
 			statement.close();
+			con.close();
 		} catch (Exception der) {
 			b_no.setText("Error Occurs: \n" + der);
 		}
@@ -919,6 +920,8 @@ public class LibraryApplet extends JApplet {
 					//"returndate = '" + returnDates.get(arrayIndex) + "' AND custid = '" + custIDs.get(arrayIndex) + "'";
 					//System.out.println(theStatement);
 					//removeStatement = (PreparedStatement) con.prepareStatement(theStatement);
+					con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+					
 					removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB WHERE bookname = ? " +
 					"AND author = ? AND publication = ? AND issuedate = ? AND returndate = ? AND custid = ?");
 					
@@ -928,6 +931,7 @@ public class LibraryApplet extends JApplet {
 					removeStatement.setString(4, (String) issueDates.get(arrayIndex));
 					removeStatement.setString(5, (String) returnDates.get(arrayIndex));
 					removeStatement.setString(6, (String) custIDs.get(arrayIndex));
+					
 					
 					removeStatement.executeUpdate();
 					
