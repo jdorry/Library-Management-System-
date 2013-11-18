@@ -887,11 +887,12 @@ public class LibraryApplet extends JApplet {
 		b2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
-				int listIndex, arrayIndex, i, bookCount;
+				int listIndex, arrayIndex, i, bookCount, deleteSuccess;
 				String removeBookName;
 				
 				arrayIndex = 0;
 				bookCount = 0;
+				deleteSuccess = 0;
 				
 				try {
 					
@@ -920,21 +921,29 @@ public class LibraryApplet extends JApplet {
 					//"returndate = '" + returnDates.get(arrayIndex) + "' AND custid = '" + custIDs.get(arrayIndex) + "'";
 					//System.out.println(theStatement);
 					//removeStatement = (PreparedStatement) con.prepareStatement(theStatement);
-					con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
 					
-					removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB WHERE bookname = ? " +
-					"AND author = ? AND publication = ? AND issuedate = ? AND returndate = ? AND custid = ?");
+					try{
+						con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+						
+						removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB WHERE bookname = ? " +
+						"AND author = ? AND publication = ? AND issuedate = ? AND rturndate = ? AND custid = ?");
+						
+						removeStatement.setString(1, (String) bookNames.get(arrayIndex));
+						removeStatement.setString(2, (String) authors.get(arrayIndex));
+						removeStatement.setString(3, (String) publications.get(arrayIndex));
+						removeStatement.setString(4, (String) issueDates.get(arrayIndex));
+						removeStatement.setString(5, (String) returnDates.get(arrayIndex));
+						removeStatement.setString(6, (String) custIDs.get(arrayIndex));
+						
+						
+						
+						deleteSuccess = removeStatement.executeUpdate();
 					
-					removeStatement.setString(1, (String) bookNames.get(arrayIndex));
-					removeStatement.setString(2, (String) authors.get(arrayIndex));
-					removeStatement.setString(3, (String) publications.get(arrayIndex));
-					removeStatement.setString(4, (String) issueDates.get(arrayIndex));
-					removeStatement.setString(5, (String) returnDates.get(arrayIndex));
-					removeStatement.setString(6, (String) custIDs.get(arrayIndex));
-					
-					
-					removeStatement.executeUpdate();
-					
+						System.out.println(deleteSuccess);
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					bookNames.remove(arrayIndex);
 					authors.remove(arrayIndex);
 					publications.remove(arrayIndex);
