@@ -32,12 +32,20 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import com.mysql.jdbc.Connection;
+import com.mysql.jdbc.PreparedStatement;
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
+
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -57,10 +65,35 @@ public class LibraryApplet extends JApplet {
 	JProgressBar progress1;
 	FileReader rd1,rd2;
 	JFrame frame, jf55;
+	private Connection con;
+	private PreparedStatement statement, removeStatement;
+	private ResultSet result;
+	private ArrayList bookNames = new ArrayList();
+	private ArrayList authors = new ArrayList();
+	private ArrayList publications = new ArrayList();
+	private ArrayList issueDates = new ArrayList();
+	private ArrayList returnDates = new ArrayList();
+	private ArrayList<String> custIDs = new ArrayList<String>();
 	/**
 	 * Create the applet.
 	 */
 	public LibraryApplet() {
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
+		try {
+			con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			statement = (PreparedStatement) con.prepareStatement("select * from LibraryDB");
+			result = statement.executeQuery();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		panel = new JPanel();
 		panel.setBackground(SystemColor.info);
@@ -223,69 +256,29 @@ public class LibraryApplet extends JApplet {
 		panel.setVisible(true);
 		
 		try {
-			//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/pointer.mmm");
-			rd1 = new FileReader("Database/pointer.mmm");
-			read1 = new JTextField();
-			read1.read(rd1, null);
-			int count = Integer.parseInt(read1.getText());
-			int total = count - 1;
-			int blk = 0;
-			rd1.close();
-
-			for (int i = 1; i < count; i++) {
-				//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".name");
-				rd1 = new FileReader("Database/pointer.mmm" + i + ".name");
-				read1 = new JTextField();
-				read1.read(rd1, null);
-				if (!read1.getText().equals("")) {
-					blk++;
-					b_no.setText("Total Books = " + blk + " (Book's)");
-					mo1.addElement(read1.getText() + "");
-					rd1.close();
-
-					int per = i * 100 / total;
-					progress1.setValue(per);
-
-					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".author");
-					rd1 = new FileReader("Database/pointer.mmm" + i + ".author");
-					read1 = new JTextField();
-					read1.read(rd1, null);
-					mo2.addElement(read1.getText() + "");
-					rd1.close();
-
-					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".publication");
-					rd1 = new FileReader("Database/pointer.mmm" + i + ".publication");
-					read1 = new JTextField();
-					read1.read(rd1, null);
-					mo3.addElement(read1.getText() + "");
-					rd1.close();
-
-					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".issue");
-					rd1 = new FileReader("Database/pointer.mmm" + i + ".issue");
-					read1 = new JTextField();
-					read1.read(rd1, null);
-					if (!read1.getText().equals("")) {
-						mo4.addElement(read1.getText() + "");
-					} else {
-						mo4.addElement(read1.getText() + "   -");
-					}
-					rd1.close();
-
-					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".return");
-					rd1 = new FileReader("Database/pointer.mmm" + i + ".return");
-					read1 = new JTextField();
-					read1.read(rd1, null);
-					mo5.addElement(read1.getText() + "");
-					rd1.close();
-
-					//rd1 = new FileReader("C:/Users/John/git/Library-Management-System-/Library/Database/" + i + ".id");
-					rd1 = new FileReader("Database/pointer.mmm" + i + ".id");
-					read1 = new JTextField();
-					read1.read(rd1, null);
-					mo6.addElement(read1.getText() + "");
-					rd1.close();
-				}
+			int bookCount;
+			
+			bookCount = 0;
+			
+			while (result.next())
+			{
+				//System.out.println(result.getString(1));
+				mo1.addElement(result.getString(1));
+				bookNames.add(result.getString(1));
+				mo2.addElement(result.getString(2));
+				authors.add(result.getString(2));
+				mo3.addElement(result.getString(3));
+				publications.add(result.getString(3));
+				mo4.addElement(result.getString(4));
+				issueDates.add(result.getString(4));
+				mo5.addElement(result.getString(5));
+				returnDates.add(result.getString(5));
+				mo6.addElement(result.getInt(6));
+				custIDs.add(result.getString(6));
+				bookCount++;
 			}
+			
+			b_no.setText("Total Books = " + bookCount + " (Book's)");
 			
 		} catch (Exception der) {
 			b_no.setText("Error Occurs: \n" + der);
@@ -293,8 +286,15 @@ public class LibraryApplet extends JApplet {
 		
 		b5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				int bookCount;
+				boolean bookFound;
+				
+				bookFound = false;				
+				bookCount = 0;
+				
 				try {
 					int bs1 = 0;
+					
 					progress1.setValue(0);
 					mo1.removeAllElements();
 					mo2.removeAllElements();
@@ -303,198 +303,32 @@ public class LibraryApplet extends JApplet {
 					mo5.removeAllElements();
 					mo6.removeAllElements();
 
-					//ml1.setText("Book Name");
-					//ml2.setText("Author");
-					//ml3.setText("Publication");
-					//ml4.setText("Issue Date");
-					//ml5.setText("Return Date");
-					//ml6.setText("Cust. ID.");
-
 					if (!t1.getText().equals("")) {
-						rd1 = new FileReader("Database/pointer.mmm");
-						read1 = new JTextField();
-						read1.read(rd1, null);
-						int no = Integer.parseInt(read1.getText());
-						rd1.close();
-
-						int len = t1.getText().length();
-						for (int k = 0; k < len; k++) {
-							char ch = t1.getText().charAt(k);
-							stra1 = stra1 + ch;
-							// System.out.println(stra1+"");
-						}
-
-						for (int v = 1; v < no; v++) {
-							name11 = "";
-							author11 = "";
-							publication11 = "";
-							progress1.setMaximum(no);
-
-							int per = v * 100 / no;
-							progress1.updateUI();
-							progress1.setValue(per);
-
-							FileReader re1 = new FileReader("Database/" + v
-									+ ".name");
-							JTextField jt1 = new JTextField();
-							jt1.read(re1, null);
-							String name = jt1.getText();
-							re1.close();
-
-							FileReader re2 = new FileReader("Database/" + v
-									+ ".author");
-							JTextField jt2 = new JTextField();
-							jt2.read(re2, null);
-							String author = jt2.getText();
-							re2.close();
-
-							FileReader re3 = new FileReader("Database/" + v
-									+ ".publication");
-							JTextField jt3 = new JTextField();
-							jt3.read(re3, null);
-							String publication = jt3.getText();
-							re3.close();
-							find = v;
-
-							try {
-								for (int z = 0; z < len; z++) {
-
-									name11 = name11 + name.charAt(z);
-
-									// author11=author11+author.charAt(z);
-									// System.out.println(author11+"");
-									publication11 = publication11
-											+ publication.charAt(z);
-									if (z == (len - 1)) {
-										// System.out.println(name11+"");
-										// System.out.println(publication11+"");
-									}
-								}
-
-							} catch (Exception def) {
+						
+						for(int i = 0; i < bookNames.size(); i++)
+						{
+							if(bookNames.get(i).equals(t1.getText()) || publications.get(i).equals(t1.getText()))
+							{
+								mo1.addElement(bookNames.get(i));
+								mo2.addElement(authors.get(i));
+								mo3.addElement(publications.get(i));
+								mo4.addElement(issueDates.get(i));
+								mo5.addElement(returnDates.get(i));
+								mo6.addElement((String)custIDs.get(i));
+								bookFound = true;
+								bookCount++;
 							}
-
-							if (name.toLowerCase().equals(t1.getText())
-									|| name.toUpperCase().equals(t1.getText())
-									|| author.toLowerCase()
-											.equals(t1.getText())
-									|| author.toUpperCase()
-											.equals(t1.getText())
-									|| publication.toLowerCase().equals(
-											t1.getText())
-									|| publication.toUpperCase().equals(
-											t1.getText())) {
-								bs1++;
-								rd1 = new FileReader("Database/" + find
-										+ ".name");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo1.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".author");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo2.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".publication");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo3.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".issue");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo4.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".return");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo5.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find + ".id");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo6.addElement(read1.getText() + "");
-								rd1.close();
-
-							} else if (publication11.toLowerCase().equals(
-									t1.getText())
-									|| author11.toLowerCase().equals(
-											t1.getText())
-									|| name11.toLowerCase()
-											.equals(t1.getText())
-									|| publication11.toUpperCase().equals(
-											t1.getText())
-									|| author11.toUpperCase().equals(
-											t1.getText())
-									|| name11.toUpperCase()
-											.equals(t1.getText())) {
-								bs1++;
-
-								rd1 = new FileReader("Database/" + find
-										+ ".name");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo1.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".author");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo2.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".publication");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo3.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".issue");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo4.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".return");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo5.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find + ".id");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo6.addElement(read1.getText() + "");
-								rd1.close();
-
-							}
-
-							b_no.setText("Total Book Found =" + bs1
-									+ " (Book's)");
-
 						}
-
-					} else {
+						if(bookFound)
+							b_no.setText("Total Books = " + bookCount + " (Book's)");
+						else
+							b_no.setText("Book not found.");
+						
+						
+					} 
+					else {
 						progress1.setValue(0);
-						JOptionPane.showMessageDialog((Component) null,
-								"Please Enter the Book Name or Publcation",
-								"Library Management(Pravin Rane)",
-								JOptionPane.OK_OPTION);
-						b_no.setText("User Input Error!");
+						b_no.setText("Please Enter the Book Name or Publcation");
 					}
 
 				} catch (Exception der) {
@@ -502,10 +336,18 @@ public class LibraryApplet extends JApplet {
 				}
 
 			}
+			
 		});
 		
 		b10.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				int bookCount;
+				boolean bookFound;
+				
+				bookCount = 0;
+				bookFound = false;
+				
 				try {
 					int bs2 = 0;
 					progress1.setValue(0);
@@ -516,182 +358,33 @@ public class LibraryApplet extends JApplet {
 					mo5.removeAllElements();
 					mo6.removeAllElements();
 
-					//ml1.setText("Book Name");
-					//ml2.setText("Author");
-					//ml3.setText("Publication");
-					//ml4.setText("Issue Date");
-					//ml5.setText("Return Date");
-					//ml6.setText("Cust. ID.");
-
 					if (!t14.getText().equals("")) {
-
-						rd1 = new FileReader("Database/pointer.mmm");
-						read1 = new JTextField();
-						read1.read(rd1, null);
-						int no = Integer.parseInt(read1.getText());
-						rd1.close();
-
-						int len = t14.getText().length();
-						for (int k = 0; k < len; k++) {
-							char ch = t14.getText().charAt(k);
-							stra1 = stra1 + ch;
-							// System.out.println(stra1+"");
-						}
-
-						for (int v = 1; v < no; v++) {
-							name11 = "";
-							author11 = "";
-							publication11 = "";
-							progress1.setMaximum(no);
-
-							int per = v * 100 / no;
-							progress1.updateUI();
-							progress1.setValue(per);
-
-							FileReader re1 = new FileReader("Database/" + v
-									+ ".name");
-							JTextField jt1 = new JTextField();
-							jt1.read(re1, null);
-							String name = jt1.getText();
-							re1.close();
-
-							FileReader re2 = new FileReader("Database/" + v
-									+ ".author");
-							JTextField jt2 = new JTextField();
-							jt2.read(re2, null);
-							String author = jt2.getText();
-							re2.close();
-
-							FileReader re3 = new FileReader("Database/" + v
-									+ ".publication");
-							JTextField jt3 = new JTextField();
-							jt3.read(re3, null);
-							String publication = jt3.getText();
-							re3.close();
-							find = v;
-
-							try {
-								for (int z = 0; z < len; z++) {
-
-									// name11=name11+name.charAt(z);
-
-									author11 = author11 + author.charAt(z);
-									// System.out.println(author11+"");
-									// publication11=publication11+publication.charAt(z);
-									if (z == (len - 1)) {
-										// System.out.println(name11+"");
-										// System.out.println(publication11+"");
-									}
-								}
-
-							} catch (Exception def) {
+						
+						for(int i = 0; i < authors.size(); i++)
+						{
+							if(authors.get(i).equals(t14.getText()))
+							{
+								mo1.addElement(bookNames.get(i));
+								mo2.addElement(authors.get(i));
+								mo3.addElement(publications.get(i));
+								mo4.addElement(issueDates.get(i));
+								mo5.addElement(returnDates.get(i));
+								mo6.addElement(custIDs.get(i));
+								bookFound = true;
+								bookCount++;
 							}
-
-							if (author.toLowerCase().equals(t14.getText())
-									|| author.toUpperCase().equals(
-											t14.getText())) {
-								bs2++;
-								rd1 = new FileReader("Database/" + find
-										+ ".name");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo1.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".author");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo2.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".publication");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo3.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".issue");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo4.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".return");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo5.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find + ".id");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo6.addElement(read1.getText() + "");
-								rd1.close();
-
-							} else if (author11.toLowerCase().equals(
-									t14.getText())
-									|| author11.toUpperCase().equals(
-											t14.getText())) {
-								bs2++;
-
-								rd1 = new FileReader("Database/" + find
-										+ ".name");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo1.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".author");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo2.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".publication");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo3.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".issue");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo4.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find
-										+ ".return");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo5.addElement(read1.getText() + "");
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + find + ".id");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								mo6.addElement(read1.getText() + "");
-								rd1.close();
-
-							}
-
-							b_no.setText("Total Book Found =" + bs2
-									+ " (Book's)");
-
 						}
-					} else {
+						if(bookFound)
+							b_no.setText("Total Books = " + bookCount + " (Book's)");
+						else
+							b_no.setText("Book not found.");
+						
+						
+					} 
+					else 
+					{
 						progress1.setValue(0);
-						b_no.setText("User Input Error!");
-						JOptionPane.showMessageDialog((Component) null,
-								"Please Enter the Book Author name",
-								"Library Management(Pravin Rane)",
-								JOptionPane.OK_OPTION);
+						b_no.setText("Please Enter the Book Author name.");
 					}
 				} catch (Exception der) {
 					System.out.println("Error:" + der);
@@ -826,85 +519,32 @@ public class LibraryApplet extends JApplet {
 
 		b4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				
+				int bookCount;
+				
+				bookCount = 0;
+				
 				try {
+					
 					mo1.removeAllElements();
 					mo2.removeAllElements();
 					mo3.removeAllElements();
 					mo4.removeAllElements();
 					mo5.removeAllElements();
 					mo6.removeAllElements();
-
-					//ml1.setText("Book Name");
-					//ml2.setText("Author");
-					//ml3.setText("Publication");
-					//ml4.setText("Issue Date");
-					//ml5.setText("Return Date");
-					//ml6.setText("Cust. ID.");
-					int za = 0;
-
-					rd1 = new FileReader("Database/pointer.mmm");
-					read1 = new JTextField();
-					read1.read(rd1, null);
-					int count = Integer.parseInt(read1.getText());
-					int total = count - 1;
-
-					rd1.close();
-
-					for (int i = 1; i < count; i++) {
-
-						rd1 = new FileReader("Database/" + i + ".name");
-						read1 = new JTextField();
-						read1.read(rd1, null);
-						if (!read1.getText().equals("")) {
-							za++;
-							b_no.setText("Total Books = " + za + " (Book's)");
-							mo1.addElement(read1.getText() + "");
-							rd1.close();
-
-							progress1.setMaximum(total);
-							int per = i * 100 / total;
-							progress1.setValue(per);
-
-							rd1 = new FileReader("Database/" + i + ".author");
-							read1 = new JTextField();
-							read1.read(rd1, null);
-							mo2.addElement(read1.getText() + "");
-							rd1.close();
-
-							rd1 = new FileReader("Database/" + i
-									+ ".publication");
-							read1 = new JTextField();
-							read1.read(rd1, null);
-							mo3.addElement(read1.getText() + "");
-							rd1.close();
-
-							rd1 = new FileReader("Database/" + i + ".issue");
-							read1 = new JTextField();
-							read1.read(rd1, null);
-							if (!read1.getText().equals("")) {
-								mo4.addElement(read1.getText() + "");
-							} else {
-								mo4.addElement(read1.getText() + "   _");
-							}
-							rd1.close();
-
-							rd1 = new FileReader("Database/" + i + ".return");
-							read1 = new JTextField();
-							read1.read(rd1, null);
-							mo5.addElement(read1.getText() + "");
-							rd1.close();
-
-							rd1 = new FileReader("Database/" + i + ".id");
-							read1 = new JTextField();
-							read1.read(rd1, null);
-							mo6.addElement(read1.getText() + "");
-							rd1.close();
-
-							progress1.setValue(100);
-						}
-
+					
+					for(int i = 0; i < bookNames.size(); i++)
+					{
+						mo1.addElement(bookNames.get(i));
+						mo2.addElement(authors.get(i));
+						mo3.addElement(publications.get(i));
+						mo4.addElement(issueDates.get(i));
+						mo5.addElement(returnDates.get(i));
+						mo6.addElement(custIDs.get(i));
+						bookCount++;
 					}
+					b_no.setText("Total Books = " + bookCount + " (Book's)");
+					
 				} catch (Exception der) {
 					b_no.setText("Error Occurs: \n" + der);
 				}
@@ -1244,67 +884,39 @@ public class LibraryApplet extends JApplet {
 
 		b2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int ad = list1.getSelectedIndex();
-				String str99 = (String) mo1.getElementAt(ad);
+				
+				int listIndex, arrayIndex, i;
+				String removeBookName;
+				
 				try {
-
-					rd2 = new FileReader("Database/pointer.mmm");
-					jt2 = new JTextField();
-					jt2.read(rd2, null);
-					rd2.close();
-					int nom = Integer.parseInt(jt2.getText());
-
-					for (int count2 = 1; count2 < nom; count2++) {
-						rd1 = new FileReader("Database/" + count2 + ".name");
-						read1 = new JTextField();
-						read1.read(rd1, null);
-						rd1.close();
-
-						if (read1.getText().equals(str99)) {
-							wr1 = new FileWriter("Database/" + count2 + ".name");
-							wr1.write("");
-							wr1.close();
-
-							wr1 = new FileWriter("Database/" + count2
-									+ ".author");
-							wr1.write("");
-							wr1.close();
-
-							wr1 = new FileWriter("Database/" + count2
-									+ ".publication");
-							wr1.write("");
-							wr1.close();
-
-							wr1 = new FileWriter("Database/" + count2
-									+ ".issue");
-							wr1.write("");
-							wr1.close();
-
-							wr1 = new FileWriter("Database/" + count2
-									+ ".return");
-							wr1.write("");
-							wr1.close();
-
-							wr1 = new FileWriter("Database/" + count2
-									+ ".detail");
-							wr1.write("");
-							wr1.close();
-
-							wr1 = new FileWriter("Database/" + count2 + ".id");
-							wr1.write("");
-							wr1.close();
-							try {
-								Library lbc = new Library();
-								setVisible(false);
-								lbc.setVisible(true);
-								lbc.setSize(800, 600);
-							} catch (Exception de) {
-							}
-
+					
+					listIndex = list1.getSelectedIndex();
+					removeBookName = (String) mo1.getElementAt(listIndex);
+					
+					mo1.removeAllElements();
+					mo2.removeAllElements();
+					mo3.removeAllElements();
+					mo4.removeAllElements();
+					mo5.removeAllElements();
+					mo6.removeAllElements();
+					
+					for(i = 0; i < bookNames.size(); i++)
+					{
+						if(bookNames.get(i).equals(removeBookName))
+						{
+							arrayIndex = i;
 						}
-
 					}
-
+					
+					//removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB")
+					
+					bookNames.remove(i);
+					authors.remove(i);
+					publications.remove(i);
+					issueDates.remove(i);
+					returnDates.remove(i);
+					custIDs.remove(i);
+					
 				} catch (Exception fr) {
 					System.out.println(fr);
 				}
