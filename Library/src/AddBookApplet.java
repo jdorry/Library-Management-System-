@@ -8,8 +8,15 @@ import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
+
+import com.mysql.jdbc.PreparedStatement;
+import com.mysql.jdbc.Statement;
 
 import java.awt.Font;
 import java.awt.SystemColor;
@@ -24,14 +31,17 @@ public class AddBookApplet extends JApplet {
 	JButton b1, b2, b3, b4, b5, b6, b7, b8, b9, b10;
 	JLabel l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14;
 	JPanel jp1, jp2, jp3, jp4, jp5, jp6, panel;
-	FileReader rd1;
+	//FileReader rd1;
 	JTextField read1;
-	FileWriter wr1;
+	//FileWriter wr1;
 	private JTextField textField;
 	private JTextField textField_1;
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField textField_4;
+	String bookname, author, publication, issDate, retDate, custid;
+	//Statement statement = null;
+	//private ResultSet result;
 	/**
 	 * Create the applet.
 	 */
@@ -87,6 +97,7 @@ public class AddBookApplet extends JApplet {
 		t4.setColumns(10);
 		t4.setBounds(119, 142, 133, 20);
 		panel.add(t4);
+		t4.setText("-");
 		
 		l5 = new JLabel("Book Details");
 		l5.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -110,11 +121,46 @@ public class AddBookApplet extends JApplet {
 		b3.setBounds(231, 266, 89, 23);
 		panel.add(b3);
 		
+		
+		
 		b1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
 				try {
-					rd1 = new FileReader("Database/pointer.mmm");
+					bookname = t1.getText();
+					author = t2.getText();
+					publication = t3.getText();
+					issDate = t4.getText();
+					retDate = "-";
+					custid = "-";
+					try{
+						Class.forName("com.mysql.jdbc.Driver").newInstance();
+						
+						Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+						
+						PreparedStatement statement = null; 
+								statement = (PreparedStatement) con.prepareStatement("INSERT INTO " +
+										"LibraryDB(bookname, author, publication, issuedate, rturndate, custid) " +
+										"VALUES(?, ?, ?, ?, ?, ?)");
+						statement.setString(1, bookname);
+						statement.setString(2, author);
+						statement.setString(3, publication);
+						statement.setString(4, issDate);
+						statement.setString(5, retDate);
+						statement.setString(6, custid);
+						statement.executeUpdate();
+						
+					}
+					catch (SQLException e1){
+						e1.printStackTrace();
+					} catch (InstantiationException e1) {
+						e1.printStackTrace();
+					} catch (IllegalAccessException e1) {
+						e1.printStackTrace();
+					} catch (ClassNotFoundException e1) {
+						e1.printStackTrace();
+					}
+					/* rd1 = new FileReader("Database/pointer.mmm");
 					read1 = new JTextField();
 					read1.read(rd1, null);
 					int count2 = Integer.parseInt(read1.getText());
@@ -152,7 +198,7 @@ public class AddBookApplet extends JApplet {
 
 					wr1 = new FileWriter("Database/pointer.mmm");
 					wr1.write(count2 + "");
-					wr1.close();
+					wr1.close(); */
 
 					setVisible(false);
 				} catch (Exception gr) {

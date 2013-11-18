@@ -1,32 +1,38 @@
-import javax.swing.JApplet;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-
-import java.applet.Applet;
-import java.applet.AppletStub;
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
-
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
+import javax.swing.JApplet;
 import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import com.mysql.jdbc.PreparedStatement;
 
 @SuppressWarnings("serial")
 public class Login extends JApplet {
 	private JTextField textField;
 	private JPasswordField passwordField;
-	private JPanel panel;
-
+	public JPanel panel;
+	
+	private ResultSet result;
+	ArrayList usernames = new ArrayList();
+	ArrayList passwords = new ArrayList();
+	Boolean userMatch = false;
 	/**
 	 * Create the applet.
 	 */
 	
 	public Login() {
+		
 		
 		panel = new JPanel();
 		panel.setBackground(Color.GRAY);
@@ -65,16 +71,54 @@ public class Login extends JApplet {
 		panel.add(lblPleaseCheckUsername);
 		panel.setVisible(true);
 		
+		try{
+			Class.forName("com.mysql.jdbc.Driver").newInstance();
+			
+			Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			
+			PreparedStatement statement = (PreparedStatement) con.prepareStatement("SELECT * FROM `users`");
+			
+			result = statement.executeQuery();
+			}
+		catch (SQLException e){
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		
+		try {
+			while (result.next()){
+				usernames.add(result.getString(1));
+				passwords.add(result.getString(2));
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//if (textField.getText().equals("admin")
-					//	&& passwordField.getText().equals("admin")) {
+				for (int i = 0; i < usernames.size(); i++){
+					if (usernames.get(i).equals(textField.getText()) && passwords.get(i).equals(passwordField.getText())){
+						userMatch = true;
+					}
+					else {
+						userMatch = false;
+					}
+				}
+				
+				
+				if (userMatch) {
 					 //Library lb = new Library();
 					// splash1 s=new splash1();
 					 //setVisible(false);
 					 //lb.setVisible(true);
 					// lb.setSize(800, 600);
-						 
+					
 					LibraryApplet library = new LibraryApplet();
 					library.init();
 					library.start();
@@ -83,10 +127,10 @@ public class Login extends JApplet {
 					add("Center", library);
 	 
 
-				//} else {
-					//lblPleaseCheckUsername.setVisible(true);
-					//lblPleaseCheckUsername.setForeground(Color.red);
-				//}
+				} else {
+					lblPleaseCheckUsername.setVisible(true);
+					lblPleaseCheckUsername.setForeground(Color.red);
+				}
 
 			}
 		});
