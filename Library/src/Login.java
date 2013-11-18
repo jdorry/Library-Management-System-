@@ -22,6 +22,7 @@ public class Login extends JApplet {
 	private JTextField textField;
 	private JPasswordField passwordField;
 	public JPanel panel;
+	private JLabel lblPleaseCheckUsername;
 	
 	private ResultSet result;
 	ArrayList usernames = new ArrayList();
@@ -33,7 +34,7 @@ public class Login extends JApplet {
 	
 	public Login() {
 		
-		
+	try{	
 		panel = new JPanel();
 		panel.setBackground(Color.GRAY);
 		getContentPane().add(panel, BorderLayout.CENTER);
@@ -64,7 +65,7 @@ public class Login extends JApplet {
 		btnCancel.setBounds(196, 165, 89, 23);
 		panel.add(btnCancel);
 		
-		final JLabel lblPleaseCheckUsername = new JLabel("Please Check Username and Password");
+		lblPleaseCheckUsername = new JLabel("Please Check Username and Password");
 		lblPleaseCheckUsername.setBounds(97, 210, 276, 14);
 		lblPleaseCheckUsername.setVisible(false);
 		lblPleaseCheckUsername.setForeground(getBackground());
@@ -72,24 +73,23 @@ public class Login extends JApplet {
 		panel.setVisible(true);
 		
 		try{
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			
+			Class.forName("com.mysql.jdbc.Driver");
 			Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			//Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com/lmsdatabase", "tyler", "Ambition8143");
 			
 			PreparedStatement statement = (PreparedStatement) con.prepareStatement("SELECT * FROM `users`");
 			
 			result = statement.executeQuery();
+			
 			}
 		catch (SQLException e){
 			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
+		} catch (Exception e){
+			e.printStackTrace();
 		}
-		
 		
 		try {
 			while (result.next()){
@@ -140,9 +140,15 @@ public class Login extends JApplet {
 				try {
 					System.exit(0);
 				} catch (Exception ftr) {
+					ftr.printStackTrace();
 				}
 			}
 		});
+	}
+	catch (Exception e){
+		e.printStackTrace();
+		lblPleaseCheckUsername.setText(e.toString());
+	}
 
 	}
 	

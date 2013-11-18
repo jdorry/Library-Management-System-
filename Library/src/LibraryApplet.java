@@ -87,7 +87,8 @@ public class LibraryApplet extends JApplet {
 		}
 		
 		try {
-			con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			//con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
 			statement = (PreparedStatement) con.prepareStatement("select * from LibraryDB");
 			result = statement.executeQuery();
 		} catch (SQLException e1) {
