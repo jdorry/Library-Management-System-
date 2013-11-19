@@ -73,7 +73,12 @@ public class LibraryApplet extends JApplet {
 	private ArrayList publications = new ArrayList();
 	private ArrayList issueDates = new ArrayList();
 	private ArrayList returnDates = new ArrayList();
-	private ArrayList<String> custIDs = new ArrayList<String>();
+	private ArrayList custIDs = new ArrayList();
+	private ArrayList userIDs = new ArrayList();
+	private ArrayList userFirstNames = new ArrayList();
+	private ArrayList userLastNames = new ArrayList();
+	private ArrayList regDates = new ArrayList();
+	
 	/**
 	 * Create the applet.
 	 */
@@ -108,7 +113,7 @@ public class LibraryApplet extends JApplet {
 		
 		mo1 = new DefaultListModel();
 		list1 = new JList(mo1);
-		JLabel ml1 = new JLabel("Book's Name");
+		ml1 = new JLabel("Book's Name");
 		ml1.setBounds(10, 11, 65, 14);
 		list1.setBounds(10, 25, 99, 414);
 		list1.setToolTipText("Name of Book's Present in Database");
@@ -224,7 +229,7 @@ public class LibraryApplet extends JApplet {
 		jp4.add(t2);
 		t2.setColumns(10);
 		
-		b7 = new JButton("Search");
+		b7 = new JButton("Search Customer");
 		jp4.add(b7);
 		
 		b8 = new JButton("Delete Customer");
@@ -281,7 +286,20 @@ public class LibraryApplet extends JApplet {
 			
 			b_no.setText("Total Books = " + bookCount + " (Book's)");
 			statement.close();
+			
+			statement = (PreparedStatement) con.prepareStatement("select * from users");
+			result = statement.executeQuery();
+			
+			while (result.next())
+			{
+				userIDs.add(result.getString(5));
+				userFirstNames.add(result.getString(3));
+				userLastNames.add(result.getString(4));
+				regDates.add(result.getString(6));
+			}
+			statement.close();
 			con.close();
+			
 		} catch (Exception der) {
 			b_no.setText("Error Occurs: \n" + der);
 		}
@@ -296,6 +314,13 @@ public class LibraryApplet extends JApplet {
 				
 				try {
 					int bs1 = 0;
+					
+					ml1.setText("Book Name");
+					ml2.setText("Author");
+					ml3.setText("Publication");
+					ml4.setText("Issue Date");
+					ml5.setText("Return Date");
+					ml6.setText("Cust. ID.");
 					
 					progress1.setValue(0);
 					mo1.removeAllElements();
@@ -353,6 +378,14 @@ public class LibraryApplet extends JApplet {
 				try {
 					int bs2 = 0;
 					progress1.setValue(0);
+					
+					ml1.setText("Book Name");
+					ml2.setText("Author");
+					ml3.setText("Publication");
+					ml4.setText("Issue Date");
+					ml5.setText("Return Date");
+					ml6.setText("Cust. ID.");
+					
 					mo1.removeAllElements();
 					mo2.removeAllElements();
 					mo3.removeAllElements();
@@ -492,11 +525,6 @@ public class LibraryApplet extends JApplet {
 
 		b15.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//Addcust ad = new Addcust();
-				//ad.setVisible(true);
-				//ad.setSize(380, 400);
-				//ad.setLocation(80, 140);
-				//LibraryApplet library = new LibraryApplet();
 				AddCustApplet aCA = new AddCustApplet();
 				aCA.init();
 				aCA.start();
@@ -508,8 +536,6 @@ public class LibraryApplet extends JApplet {
 		
 		b1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//addBook a = new addBook();
-				//LibraryApplet library = new LibraryApplet();
 				AddBookApplet aBA = new AddBookApplet();
 				aBA.init();
 				aBA.start();
@@ -527,6 +553,13 @@ public class LibraryApplet extends JApplet {
 				bookCount = 0;
 				
 				try {
+					
+					ml1.setText("Book Name");
+					ml2.setText("Author");
+					ml3.setText("Publication");
+					ml4.setText("Issue Date");
+					ml5.setText("Return Date");
+					ml6.setText("Cust. ID.");
 					
 					mo1.removeAllElements();
 					mo2.removeAllElements();
@@ -560,16 +593,19 @@ public class LibraryApplet extends JApplet {
 
 		b6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String firstLastName;
+				boolean match;
+				match = false;
 				try {
-					/*
+					
+					
+					
 					ml1.setText("Cust. ID");
 					ml2.setText("Cust. Name");
-					ml3.setText("Registration Date");
+					ml3.setText("Reg. Date");
 					ml4.setText("Book Name");
 					ml5.setText("Purchase Date");
 					ml6.setText("Return Date");
-					*/
-					int z12 = 0;
 
 					mo1.removeAllElements();
 					mo2.removeAllElements();
@@ -577,76 +613,34 @@ public class LibraryApplet extends JApplet {
 					mo4.removeAllElements();
 					mo5.removeAllElements();
 					mo6.removeAllElements();
-
-					rd2 = new FileReader("Cust_Details/pointer.mmm");
-					jt2 = new JTextField();
-					jt2.read(rd2, null);
-					rd2.close();
-
-					int no = Integer.parseInt(jt2.getText());
-					int tt = no - 1;
-					// b_no.setText("Total Customer's :"+tt );
-
-					for (int v = 1; v < no; v++) {
-
-						rd2 = new FileReader("Cust_Details/Cus" + v + ".id");
-						jt2 = new JTextField();
-						jt2.read(rd2, null);
-						if (!jt2.getText().equals("")) {
-							z12++;
-							b_no.setText("Total Customers = " + z12);
-							mo1.addElement(jt2.getText() + "");
-							rd2.close();
-
-							rd2 = new FileReader("Cust_Details/Cus" + v
-									+ ".name");
-							jt2 = new JTextField();
-							jt2.read(rd2, null);
-							mo2.addElement(jt2.getText() + "");
-							rd2.close();
-
-							rd2 = new FileReader("Cust_Details/Cus" + v
-									+ ".date");
-							jt2 = new JTextField();
-							jt2.read(rd2, null);
-							mo3.addElement(jt2.getText() + "");
-							rd2.close();
-
-							rd2 = new FileReader("Cust_Details/Cus" + v
-									+ ".bname");
-							jt2 = new JTextField();
-							jt2.read(rd2, null);
-							if (!jt2.getText().equals("")) {
-								mo4.addElement(jt2.getText() + "");
-							} else {
-								mo4.addElement(jt2.getText() + "   _");
+					
+					for(int i = 0; i < userIDs.size(); i++)
+					{
+						mo1.addElement(userIDs.get(i));
+						firstLastName = userFirstNames.get(i) + " " + userLastNames.get(i);
+						mo2.addElement(firstLastName);
+						mo3.addElement(regDates.get(i));
+						
+						for(int j = 0; j < custIDs.size(); j++)
+						{
+							if(custIDs.get(j).equals(userIDs.get(i)))
+							{
+								match = true;
+								mo4.addElement(bookNames.get(j));
+								mo5.addElement(issueDates.get(j));
+								mo6.addElement(returnDates.get(j));
 							}
-							rd2.close();
-
-							rd2 = new FileReader("Cust_Details/Cus" + v
-									+ ".purchase");
-							jt2 = new JTextField();
-							jt2.read(rd2, null);
-							if (!jt2.getText().equals("")) {
-								mo5.addElement(jt2.getText() + "");
-							} else {
-								mo5.addElement(jt2.getText() + "   _");
-							}
-							rd2.close();
-
-							rd2 = new FileReader("Cust_Details/Cus" + v
-									+ ".return");
-							jt2 = new JTextField();
-							jt2.read(rd2, null);
-							if (!jt2.getText().equals("")) {
-								mo6.addElement(jt2.getText() + "");
-							} else {
-								mo6.addElement(jt2.getText() + "   _");
-							}
-							rd2.close();
+							
+						}
+						
+						if(!match)
+						{
+							match = false;
+							mo4.addElement(" ");
+							mo5.addElement(" ");
+							mo6.addElement(" ");
 						}
 					}
-
 				} catch (Exception ser) {
 					System.out.println(ser);
 				}
@@ -759,124 +753,67 @@ public class LibraryApplet extends JApplet {
 
 		b7.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String mysearchid = t2.getText();
-				try {
-					/*
-					ml1.setText("Cust. ID");
-					ml2.setText("Cust. Name");
-					ml3.setText("Registration Date");
-					ml4.setText("Book Name");
-					ml5.setText("Purchase Date");
-					ml6.setText("Return Date");
-					*/
-					mo1.removeAllElements();
-					mo2.removeAllElements();
-					mo3.removeAllElements();
-					mo4.removeAllElements();
-					mo5.removeAllElements();
-					mo6.removeAllElements();
-
-					if (!t2.getText().equals("")) {
-						rd2 = new FileReader("Cust_Details/pointer.mmm");
-						jt2 = new JTextField();
-						jt2.read(rd2, null);
-						rd2.close();
-						int no = Integer.parseInt(jt2.getText());
-
-						int len3 = t2.getText().length();
-
-						for (int v = 1; v < no; v++) {
-							name22 = "";
-							int lg = 0;
-							rd2 = new FileReader("Cust_Details/Cus" + v + ".id");
-							jt2 = new JTextField();
-							jt2.read(rd2, null);
-							// mo1.addElement(jt2.getText()+"");
-							String s1 = jt2.getText();
-							rd2.close();
-
-							rd2 = new FileReader("Cust_Details/Cus" + v
-									+ ".name");
-							jt2 = new JTextField();
-							jt2.read(rd2, null);
-							// mo2.addElement(jt2.getText()+"");
-							String s2 = jt2.getText();
-							rd2.close();
-
-							for (int z = 0; z < len3; z++) {
-								name22 = name22 + s2.charAt(z);
-							}
-
-							if (s1.toLowerCase().equals(mysearchid)
-									|| s1.toUpperCase().equals(mysearchid)
-									|| s2.toLowerCase().equals(mysearchid)
-									|| s2.toUpperCase().equals(mysearchid)
-									|| name22.toUpperCase().equals(mysearchid)
-									|| name22.toLowerCase().equals(mysearchid)) {
-								lg++;
-								b_no.setText("Customer Found :" + lg);
-								rd2 = new FileReader("Cust_Details/Cus" + v
-										+ ".id");
-								jt2 = new JTextField();
-								jt2.read(rd2, null);
-								mo1.addElement(jt2.getText() + "");
-								rd2.close();
-
-								rd2 = new FileReader("Cust_Details/Cus" + v
-										+ ".name");
-								jt2 = new JTextField();
-								jt2.read(rd2, null);
-								mo2.addElement(jt2.getText() + "");
-								rd2.close();
-
-								rd2 = new FileReader("Cust_Details/Cus" + v
-										+ ".date");
-								jt2 = new JTextField();
-								jt2.read(rd2, null);
-								mo3.addElement(jt2.getText() + "");
-								rd2.close();
-
-								rd2 = new FileReader("Cust_Details/Cus" + v
-										+ ".bname");
-								jt2 = new JTextField();
-								jt2.read(rd2, null);
-								if (!jt2.getText().equals("")) {
-									mo4.addElement(jt2.getText() + "");
-								} else {
-									mo4.addElement(jt2.getText() + "   _");
-								}
-								rd2.close();
-
-								rd2 = new FileReader("Cust_Details/Cus" + v
-										+ ".purchase");
-								jt2 = new JTextField();
-								jt2.read(rd2, null);
-								if (!jt2.getText().equals("")) {
-									mo5.addElement(jt2.getText() + "");
-								} else {
-									mo5.addElement(jt2.getText() + "   _");
-								}
-								rd2.close();
-
-								rd2 = new FileReader("Cust_Details/Cus" + v
-										+ ".return");
-								jt2 = new JTextField();
-								jt2.read(rd2, null);
-								if (!jt2.getText().equals("")) {
-									mo6.addElement(jt2.getText() + "");
-								} else {
-									mo6.addElement(jt2.getText() + "   _");
-								}
-								rd2.close();
-							}
-						}
-					} else {
+				try {				
+					boolean match;
+					String searchID, firstLastName;
+					
+					match = false;				
+					
+					try {
+						int bs1 = 0;
+						
+						ml1.setText("Cust. ID");
+						ml2.setText("Cust. Name");
+						ml3.setText("Reg. Date");
+						ml4.setText("Book Name");
+						ml5.setText("Purchase Date");
+						ml6.setText("Return Date");
+						
 						progress1.setValue(0);
-						b_no.setText("User Input Error!");
-						JOptionPane.showMessageDialog((Component) null,
-								"Please Enter Customer Id or Name",
-								"Library Management(Pravin Rane)",
-								JOptionPane.OK_OPTION);
+						mo1.removeAllElements();
+						mo2.removeAllElements();
+						mo3.removeAllElements();
+						mo4.removeAllElements();
+						mo5.removeAllElements();
+						mo6.removeAllElements();
+
+						if (!t2.getText().equals("")) {
+							
+							searchID = t2.getText();
+							
+							for(int i = 0; i < custIDs.size(); i++)
+							{
+								if(userIDs.get(i).equals(searchID))
+								{
+									mo1.addElement(userIDs.get(i));
+									firstLastName = userFirstNames.get(i) + " " + userLastNames.get(i);
+									mo2.addElement(firstLastName);
+									mo3.addElement(regDates.get(i));
+									for(int j = 0; j < custIDs.size(); j++)
+									{
+										if(custIDs.get(i).equals(searchID) && !match)
+										{
+											match = true;
+											mo4.addElement(bookNames.get(j));
+											mo5.addElement(issueDates.get(j));
+											mo6.addElement(returnDates.get(j));
+										}
+										
+										
+									}
+
+								}
+								
+							}
+							
+						} 
+						else {
+							progress1.setValue(0);
+							b_no.setText("Please Enter the Book Name or Publcation");
+						}
+
+					} catch (Exception der) {
+						System.out.println("Error:" + der);
 					}
 
 				} catch (Exception de) {
@@ -895,69 +832,63 @@ public class LibraryApplet extends JApplet {
 				deleteSuccess = 0;
 				
 				try {
-					
-					listIndex = list1.getSelectedIndex();
-					removeBookName = (String) mo1.getElementAt(listIndex);
-					
-					mo1.removeAllElements();
-					mo2.removeAllElements();
-					mo3.removeAllElements();
-					mo4.removeAllElements();
-					mo5.removeAllElements();
-					mo6.removeAllElements();
-					
-					for(i = 0; i < bookNames.size(); i++)
+					if (ml1.getText().equals("Book's Name"))
 					{
-						if(bookNames.get(i).equals(removeBookName))
+						listIndex = list1.getSelectedIndex();
+						removeBookName = (String) mo1.getElementAt(listIndex);
+						
+						mo1.removeAllElements();
+						mo2.removeAllElements();
+						mo3.removeAllElements();
+						mo4.removeAllElements();
+						mo5.removeAllElements();
+						mo6.removeAllElements();
+						
+						for(i = 0; i < bookNames.size(); i++)
 						{
-							arrayIndex = i;
+							if(bookNames.get(i).equals(removeBookName))
+							{
+								arrayIndex = i;
+							}
 						}
-					}
-					//DELETE FROM Customers
-					//WHERE CustomerName='Alfreds Futterkiste' AND ContactName='Maria Anders';
-					//String theStatement = "DELETE FROM LibraryDB" +
-					//" WHERE bookname = '" + bookNames.get(arrayIndex) + "' AND author = '" + authors.get(arrayIndex) + "' AND " +
-					//"publication = '" + publications.get(arrayIndex) + "' AND issuedate = '" + issueDates.get(arrayIndex) + "' AND " +
-					//"returndate = '" + returnDates.get(arrayIndex) + "' AND custid = '" + custIDs.get(arrayIndex) + "'";
-					//System.out.println(theStatement);
-					//removeStatement = (PreparedStatement) con.prepareStatement(theStatement);
-					
-					try{
-						con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
 						
-						removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB WHERE bookname = ? " +
-						"AND author = ? AND publication = ? AND issuedate = ? AND rturndate = ? AND custid = ?");
+						try{
+							con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+							
+							removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB WHERE bookname = ? " +
+							"AND author = ? AND publication = ? AND issuedate = ? AND rturndate = ? AND custid = ?");
+							
+							removeStatement.setString(1, (String) bookNames.get(arrayIndex));
+							removeStatement.setString(2, (String) authors.get(arrayIndex));
+							removeStatement.setString(3, (String) publications.get(arrayIndex));
+							removeStatement.setString(4, (String) issueDates.get(arrayIndex));
+							removeStatement.setString(5, (String) returnDates.get(arrayIndex));
+							removeStatement.setString(6, (String) custIDs.get(arrayIndex));
+							
+							deleteSuccess = removeStatement.executeUpdate();
+						} catch (SQLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						bookNames.remove(arrayIndex);
+						authors.remove(arrayIndex);
+						publications.remove(arrayIndex);
+						issueDates.remove(arrayIndex);
+						returnDates.remove(arrayIndex);
+						custIDs.remove(arrayIndex);
 						
-						removeStatement.setString(1, (String) bookNames.get(arrayIndex));
-						removeStatement.setString(2, (String) authors.get(arrayIndex));
-						removeStatement.setString(3, (String) publications.get(arrayIndex));
-						removeStatement.setString(4, (String) issueDates.get(arrayIndex));
-						removeStatement.setString(5, (String) returnDates.get(arrayIndex));
-						removeStatement.setString(6, (String) custIDs.get(arrayIndex));
-						
-						deleteSuccess = removeStatement.executeUpdate();
-					} catch (SQLException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						for(i = 0; i < bookNames.size(); i ++)
+						{
+							mo1.addElement(bookNames.get(i));
+							mo2.addElement(authors.get(i));
+							mo3.addElement(publications.get(i));
+							mo4.addElement(issueDates.get(i));
+							mo5.addElement(returnDates.get(i));
+							mo6.addElement(custIDs.get(i));
+							bookCount++;
+						}
+						b_no.setText("Total Books = " + bookCount + " (Book's)");
 					}
-					bookNames.remove(arrayIndex);
-					authors.remove(arrayIndex);
-					publications.remove(arrayIndex);
-					issueDates.remove(arrayIndex);
-					returnDates.remove(arrayIndex);
-					custIDs.remove(arrayIndex);
-					
-					for(i = 0; i < bookNames.size(); i ++)
-					{
-						mo1.addElement(bookNames.get(i));
-						mo2.addElement(authors.get(i));
-						mo3.addElement(publications.get(i));
-						mo4.addElement(issueDates.get(i));
-						mo5.addElement(returnDates.get(i));
-						mo6.addElement(custIDs.get(i));
-						bookCount++;
-					}
-					b_no.setText("Total Books = " + bookCount + " (Book's)");
 				} catch (Exception fr) {
 				}
 

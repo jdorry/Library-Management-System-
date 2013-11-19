@@ -8,10 +8,14 @@ import javax.swing.UIManager;
 import java.awt.BorderLayout;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JButton;
+
+import com.mysql.jdbc.PreparedStatement;
 
 import java.awt.Font;
 import java.awt.SystemColor;
@@ -186,6 +190,36 @@ public class AddCustApplet extends JApplet {
 			public void actionPerformed(ActionEvent e) {
 
 				try {
+					
+					if(!user.getText().equals("") && !pass.getText().equals("") && !t1.getText().equals(""))
+					{
+						Class.forName("com.mysql.jdbc.Driver").newInstance();
+						
+						Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+						//Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
+
+						PreparedStatement statement = null; 
+								statement = (PreparedStatement) con.prepareStatement("INSERT INTO " +
+										"users(username, password, custfirstname, custlastname, ID, regdate) " +
+										"VALUES(?, ?, ?, ?, ?, ?)");
+						statement.setString(1, user.getText());
+						statement.setString(2, pass.getText());
+						statement.setString(3, t2.getText());
+						statement.setString(4, t21.getText());
+						statement.setString(5, t1.getText());
+						statement.setString(6, t3.getText());
+						statement.executeUpdate();
+						statement.close();
+						con.close();		
+						
+						LibraryApplet library = new LibraryApplet();
+						library.init();
+						library.start();
+						panel.setVisible(false);
+						setLayout(new BorderLayout(800, 600));
+						add("Center", library);
+					}
+					
 				} catch (Exception gr) {
 				}
 			}

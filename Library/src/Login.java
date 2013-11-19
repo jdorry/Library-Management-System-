@@ -103,11 +103,15 @@ public class Login extends JApplet {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				for (int i = 0; i < usernames.size(); i++){
-					if (usernames.get(i).equals(textField.getText()) && passwords.get(i).equals(passwordField.getText())){
-						userMatch = true;
-					}
-					else {
-						userMatch = false;
+					if(!userMatch)
+					{
+						if (usernames.get(i).equals(textField.getText()) && passwords.get(i).equals(passwordField.getText())){
+							userMatch = true;
+							lblPleaseCheckUsername.setText("match");
+						}
+						else {
+							userMatch = false;
+						}
 					}
 				}
 				
