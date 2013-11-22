@@ -60,6 +60,8 @@ public class CustLibraryView extends JApplet {
 	private ArrayList userFirstNames = new ArrayList();
 	private ArrayList userLastNames = new ArrayList();
 	private ArrayList regDates = new ArrayList();
+	private static final int LEFT_SIDE = 524;
+	private int bookCount;
 	
 	/**
 	 * Create the applet.
@@ -91,12 +93,14 @@ public class CustLibraryView extends JApplet {
 		panel.setBounds(9,10,675,515);
 		
 		Color re = new Color(122, 145, 201);
+		Color m = new Color(139, 0, 0);
 		int h = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
 		int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 		
 		mo1 = new DefaultListModel();
 		list1 = new JList(mo1);
 		ml1 = new JLabel("Book's Name");
+		ml1.setForeground(m);
 		ml1.setBounds(10, 11, 65, 14);
 		list1.setBounds(10, 25, 99, 414);
 		list1.setToolTipText("Name of Book's Present in Database");
@@ -106,7 +110,7 @@ public class CustLibraryView extends JApplet {
 		mo2 = new DefaultListModel();
 		list2 = new JList(mo2);
 		ml2 = new JLabel("Author");
-		ml2.setForeground(re);
+		ml2.setForeground(m);
 		ml2.setBounds(119, 8, 99, 20);
 		list2.setToolTipText("Name of Book Author's Present in Database");
 		list2.setBounds(109, 25, 99, 414);
@@ -116,7 +120,7 @@ public class CustLibraryView extends JApplet {
 		mo3 = new DefaultListModel();
 		list3 = new JList(mo3);
 		ml3 = new JLabel("Publication");
-		ml3.setForeground(re);
+		ml3.setForeground(m);
 		ml3.setBounds(218, 8, 99, 20);
 		list3.setToolTipText("Name of Book's Publication Present in Database");
 		list3.setBounds(208, 25, 99, 414);
@@ -126,7 +130,7 @@ public class CustLibraryView extends JApplet {
 		mo4 = new DefaultListModel();
 		list4 = new JList(mo4);
 		ml4 = new JLabel("  Issue Date");
-		ml4.setForeground(re);
+		ml4.setForeground(m);
 		ml4.setBounds(307, 8, 70, 20);
 		list4.setToolTipText("Date of Issue Present in Database");
 		list4.setBounds(307, 25, 70, 414);
@@ -136,7 +140,7 @@ public class CustLibraryView extends JApplet {
 		mo5 = new DefaultListModel();
 		list5 = new JList(mo5);
 		ml5 = new JLabel("   Return Date");
-		ml5.setForeground(re);
+		ml5.setForeground(m);
 		ml5.setBounds(377, 8, 70, 20);
 		list5.setToolTipText("Date of Return Present in Database");
 		list5.setBounds(377, 25, 70, 414);
@@ -146,7 +150,7 @@ public class CustLibraryView extends JApplet {
 		mo6 = new DefaultListModel();
 		list6 = new JList(mo6);
 		ml6 = new JLabel("   Cust. ID");
-		ml6.setForeground(re);
+		ml6.setForeground(m);
 		ml6.setBounds(447, 8, 60, 20);
 		list6.setToolTipText("ID of customer that purchase the book last time ");
 		list6.setBounds(447, 25, 60, 414);
@@ -154,7 +158,7 @@ public class CustLibraryView extends JApplet {
 		panel.add(list6);
 		
 		JPanel jp2 = new JPanel();
-		jp2.setBounds(524, 25, 141, 66);
+		jp2.setBounds(LEFT_SIDE, 20, 160, 75);
 		panel.add(jp2);
 
 		b3 = new JButton("View Book Details");
@@ -166,11 +170,11 @@ public class CustLibraryView extends JApplet {
 		jp2.add(b4);
 
 		Color r = new Color(122, 145, 201);
-		jp2.setBackground(SystemColor.activeCaptionBorder);
+		jp2.setBackground(m);
 		
 		JPanel jp3 = new JPanel();
-		jp3.setBackground(SystemColor.activeCaptionBorder);
-		jp3.setBounds(524, 124, 141, 122);
+		jp3.setBackground(m);
+		jp3.setBounds(LEFT_SIDE, 105, 160, 75);
 		panel.add(jp3);
 		
 		t1 = new JTextField();
@@ -197,10 +201,10 @@ public class CustLibraryView extends JApplet {
 		progress1 = new JProgressBar();
 		progress1.setBackground(Color.GREEN);
 		progress1.setBounds(524, 317, 141, 25);
-		panel.add(progress1);
+		//panel.add(progress1);
 		
 		JButton btnLogout = new JButton("Logout");
-		btnLogout.setBounds(553, 379, 89, 23);
+		btnLogout.setBounds(LEFT_SIDE + 29, 190, 89, 25);
 		panel.add(btnLogout);
 		
 		for (int x = 1; x < 100; x++) {
@@ -247,7 +251,7 @@ public class CustLibraryView extends JApplet {
 		
 		b5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int bookCount;
+
 				boolean bookFound;
 				
 				bookFound = false;				

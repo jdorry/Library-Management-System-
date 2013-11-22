@@ -79,6 +79,7 @@ public class LibraryApplet extends JApplet {
 	private ArrayList userLastNames = new ArrayList();
 	private ArrayList regDates = new ArrayList();
 	private static final int LEFT_SIDE = 524;
+	private int bookCount;
 	
 	/**
 	 * Create the applet.
@@ -110,24 +111,27 @@ public class LibraryApplet extends JApplet {
 		panel.setBounds(9,10,675,515);
 		
 		Color re = new Color(122, 145, 201);
+		Color r = new Color(98, 188, 210);
+		Color m = new Color(139, 0, 0);
 		int h = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
 		int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 		
 		mo1 = new DefaultListModel();
 		list1 = new JList(mo1);
-		ml1 = new JLabel("Book's Name");
+		ml1 = new JLabel("Title");
+		ml1.setForeground(m);
 		ml1.setBounds(10, 11, 65, 14);
 		list1.setBounds(10, 25, 99, 414);
-		list1.setToolTipText("Name of Book's Present in Database");
+		list1.setToolTipText("Name of Books Present in Database");
 		panel.add(list1);
 		panel.add(ml1);
 		
 		mo2 = new DefaultListModel();
 		list2 = new JList(mo2);
 		ml2 = new JLabel("Author");
-		ml2.setForeground(re);
+		ml2.setForeground(m);
 		ml2.setBounds(119, 8, 99, 20);
-		list2.setToolTipText("Name of Book Author's Present in Database");
+		list2.setToolTipText("Name of Book Authors Present in Database");
 		list2.setBounds(109, 25, 99, 414);
 		panel.add(list2);
 		panel.add(ml2);
@@ -135,9 +139,9 @@ public class LibraryApplet extends JApplet {
 		mo3 = new DefaultListModel();
 		list3 = new JList(mo3);
 		ml3 = new JLabel("Publication");
-		ml3.setForeground(re);
+		ml3.setForeground(m);
 		ml3.setBounds(218, 8, 99, 20);
-		list3.setToolTipText("Name of Book's Publication Present in Database");
+		list3.setToolTipText("Name of Books Publication Present in Database");
 		list3.setBounds(208, 25, 99, 414);
 		panel.add(ml3);
 		panel.add(list3);
@@ -145,7 +149,7 @@ public class LibraryApplet extends JApplet {
 		mo4 = new DefaultListModel();
 		list4 = new JList(mo4);
 		ml4 = new JLabel("  Issue Date");
-		ml4.setForeground(re);
+		ml4.setForeground(m);
 		ml4.setBounds(307, 8, 70, 20);
 		list4.setToolTipText("Date of Issue Present in Database");
 		list4.setBounds(307, 25, 70, 414);
@@ -155,7 +159,7 @@ public class LibraryApplet extends JApplet {
 		mo5 = new DefaultListModel();
 		list5 = new JList(mo5);
 		ml5 = new JLabel("   Return Date");
-		ml5.setForeground(re);
+		ml5.setForeground(m);
 		ml5.setBounds(377, 8, 70, 20);
 		list5.setToolTipText("Date of Return Present in Database");
 		list5.setBounds(377, 25, 70, 414);
@@ -165,9 +169,9 @@ public class LibraryApplet extends JApplet {
 		mo6 = new DefaultListModel();
 		list6 = new JList(mo6);
 		ml6 = new JLabel("   Cust. ID");
-		ml6.setForeground(re);
+		ml6.setForeground(m);
 		ml6.setBounds(447, 8, 60, 20);
-		list6.setToolTipText("ID of customer that purchase the book last time ");
+		list6.setToolTipText("ID of customer that purchased the book last time ");
 		list6.setBounds(447, 25, 60, 414);
 		panel.add(ml6);
 		panel.add(list6);
@@ -192,11 +196,10 @@ public class LibraryApplet extends JApplet {
 		b4.setBounds(10, 115, 120, 25);
 		jp2.add(b4);
 
-		Color r = new Color(122, 145, 201);
-		jp2.setBackground(SystemColor.activeCaptionBorder);
+		jp2.setBackground(m);
 		
 		JPanel jp3 = new JPanel();
-		jp3.setBackground(SystemColor.activeCaptionBorder);
+		jp3.setBackground(m);
 		jp3.setBounds(LEFT_SIDE, 158, 160, 140);
 		panel.add(jp3);
 		
@@ -217,12 +220,18 @@ public class LibraryApplet extends JApplet {
 		b10.setMnemonic(KeyEvent.VK_N);
 		
 		JPanel jp4 = new JPanel();
-		jp4.setBackground(SystemColor.activeCaptionBorder);
-		jp4.setBounds(LEFT_SIDE, 293, 160, 200);
+		jp4.setBackground(m);
+		jp4.setBounds(LEFT_SIDE, 305, 160, 205);
 		panel.add(jp4);
 		
 		b15 = new JButton("Add Customer");
 		jp4.add(b15);
+		
+		b8 = new JButton("Delete Customer");
+		jp4.add(b8);
+		
+		b9 = new JButton("View Cust. Details");
+		jp4.add(b9);
 		
 		b6 = new JButton("View All Customers");
 		jp4.add(b6);
@@ -233,12 +242,6 @@ public class LibraryApplet extends JApplet {
 		
 		b7 = new JButton("Search Customer");
 		jp4.add(b7);
-		
-		b8 = new JButton("Delete Customer");
-		jp4.add(b8);
-		
-		b9 = new JButton("View Cust. Details");
-		jp4.add(b9);
 		
 		b_no = new JLabel();
 		b_no.setForeground(Color.red);
@@ -252,7 +255,7 @@ public class LibraryApplet extends JApplet {
 		
 		JButton btnLogout = new JButton("Logout");
 		// 553 530
-		btnLogout.setBounds(LEFT_SIDE + 29, 502, 89, 25);
+		btnLogout.setBounds(LEFT_SIDE + 29, 516, 89, 25);
 		panel.add(btnLogout);
 		
 		for (int x = 1; x < 100; x++) {
@@ -269,7 +272,7 @@ public class LibraryApplet extends JApplet {
 		panel.setVisible(true);
 		
 		try {
-			int bookCount;
+
 			
 			bookCount = 0;
 			
@@ -291,7 +294,7 @@ public class LibraryApplet extends JApplet {
 				bookCount++;
 			}
 			
-			b_no.setText("Total Books = " + bookCount + " (Book's)");
+			b_no.setText("Total Books = " + bookCount + " (Books)");
 			
 			Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
 			PreparedStatement statement = (PreparedStatement) con.prepareStatement("SELECT * FROM `users`");
@@ -836,9 +839,35 @@ public class LibraryApplet extends JApplet {
 					ak47.setEditable(false);
 					ak47.setText("Book Details"
 							+ "\n"
-							+ "**************************************************");
+							+ "\n");
 					ak47.setBounds(10, 10, 250, 250);
 					jf55.add(ak47);
+					
+					/*
+					//added
+					boolean bookFound = false;
+					if (!t1.getText().equals("")) {
+						
+						for(int i = 0; i < bookNames.size(); i++)
+						{
+							if(bookNames.get(i).equals(str34))
+							{
+								mo1.addElement(bookNames.get(i));
+								mo2.addElement(authors.get(i));
+								mo3.addElement(publications.get(i));
+								mo4.addElement(issueDates.get(i));
+								mo5.addElement(returnDates.get(i));
+								mo6.addElement((String)custIDs.get(i));
+								bookFound = true;
+								bookCount++;
+							}
+						}
+						if(bookFound)
+							b_no.setText("Total Books = " + bookCount + " (Book's)");
+						else
+							b_no.setText("Book not found.");
+					
+					//end add */
 
 					Button b1 = new Button("Ok");
 					b1.setBounds(80, 270, 100, 25);
@@ -856,7 +885,8 @@ public class LibraryApplet extends JApplet {
 					jt2.read(rd2, null);
 					rd2.close();
 					int nov = Integer.parseInt(jt2.getText());
-
+					
+					
 					for (int i = 1; i < nov; i++) {
 						rd1 = new FileReader("Database/" + i + ".name");
 						read1 = new JTextField();
