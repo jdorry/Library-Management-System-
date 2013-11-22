@@ -193,9 +193,10 @@ public class AddCustApplet extends JApplet {
 					
 					if(!user.getText().equals("") && !pass.getText().equals("") && !t1.getText().equals(""))
 					{
-						Class.forName("com.mysql.jdbc.Driver").newInstance();
+						Class.forName("com.mysql.jdbc.Driver");
 						
-						Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+						Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
+						//Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
 						//Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
 
 						PreparedStatement statement = null; 

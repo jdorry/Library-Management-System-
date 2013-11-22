@@ -23,10 +23,12 @@ public class Login extends JApplet {
 	private JPasswordField passwordField;
 	public JPanel panel;
 	private JLabel lblPleaseCheckUsername;
+	String userID;
 	
 	private ResultSet result;
 	ArrayList usernames = new ArrayList();
 	ArrayList passwords = new ArrayList();
+	ArrayList ids = new ArrayList();
 	Boolean userMatch = false;
 	/**
 	 * Create the applet.
@@ -75,8 +77,10 @@ public class Login extends JApplet {
 		try{
 			
 			Class.forName("com.mysql.jdbc.Driver");
-			Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			//Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
 			//Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com/lmsdatabase", "tyler", "Ambition8143");
+			
+			Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
 			
 			PreparedStatement statement = (PreparedStatement) con.prepareStatement("SELECT * FROM `users`");
 			
@@ -95,6 +99,7 @@ public class Login extends JApplet {
 			while (result.next()){
 				usernames.add(result.getString(1));
 				passwords.add(result.getString(2));
+				ids.add(result.getString(6));
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -108,6 +113,7 @@ public class Login extends JApplet {
 						if (usernames.get(i).equals(textField.getText()) && passwords.get(i).equals(passwordField.getText())){
 							userMatch = true;
 							lblPleaseCheckUsername.setText("match");
+							userID = (String)ids.get(i);
 						}
 						else {
 							userMatch = false;
@@ -116,16 +122,27 @@ public class Login extends JApplet {
 				}
 				
 				
-				if (userMatch) {
+				if (userMatch && textField.getText().equals("admin")) {
 					
 					LibraryApplet library = new LibraryApplet();
+					library.SetLoginCustomer(userID);
 					library.init();
 					library.start();
 					panel.setVisible(false);
 					setLayout(new BorderLayout(800, 600));
 					add("Center", library);
 
-				} else {
+				} 
+				else if(userMatch)
+				{
+					CustLibraryView library = new CustLibraryView();
+					library.init();
+					library.start();
+					panel.setVisible(false);
+					setLayout(new BorderLayout(800, 600));
+					add("Center", library);
+				}
+				else {
 					lblPleaseCheckUsername.setVisible(true);
 					lblPleaseCheckUsername.setForeground(Color.red);
 				}

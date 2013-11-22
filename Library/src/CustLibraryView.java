@@ -46,6 +46,7 @@ public class CustLibraryView extends JApplet {
 	JProgressBar progress1;
 	FileReader rd1,rd2;
 	JFrame frame, jf55;
+	private String 	loggedInCust;
 	private Connection con;
 	private PreparedStatement statement, removeStatement;
 	private ResultSet result;
@@ -64,6 +65,25 @@ public class CustLibraryView extends JApplet {
 	 * Create the applet.
 	 */
 	public CustLibraryView() {
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
+		try {
+			//con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
+			//con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
+			statement = (PreparedStatement) con.prepareStatement("select * from LibraryDB");
+			result = statement.executeQuery();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		panel = new JPanel();
 		panel.setBackground(SystemColor.info);
 		getContentPane().add(panel, BorderLayout.CENTER);
@@ -220,21 +240,6 @@ public class CustLibraryView extends JApplet {
 			
 			b_no.setText("Total Books = " + bookCount + " (Book's)");
 			
-			
-			statement.close();
-			
-			statement = (PreparedStatement) con.prepareStatement("select * from users");
-			result = statement.executeQuery();
-			
-			while (result.next())
-			{
-				userIDs.add(result.getString(5));
-				userFirstNames.add(result.getString(3));
-				userLastNames.add(result.getString(4));
-				regDates.add(result.getString(6));
-			}
-			statement.close();
-			con.close();
 			
 		} catch (Exception der) {
 			b_no.setText("Error Occurs: \n" + der);
@@ -562,5 +567,9 @@ public class CustLibraryView extends JApplet {
 				add("Center", newLogin);
 			}
 		});
+	}
+	public void SetLoginCustomer(String s)
+	{
+		loggedInCust = s;
 	}
 }
