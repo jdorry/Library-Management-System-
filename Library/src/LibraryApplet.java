@@ -57,6 +57,7 @@ public class LibraryApplet extends JApplet {
 	private JButton b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b15;
 	private JTextField t1, t2, t14, read1, jt2;
 	private JPanel panel;
+	private String loggedInCust;
 	FileWriter wr1;
 	String stra1 = "", name11 = "", publication11 = "", author11 = "",
 			name22 = "";
@@ -91,7 +92,8 @@ public class LibraryApplet extends JApplet {
 		}
 		
 		try {
-			con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			//con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
 			//con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
 			statement = (PreparedStatement) con.prepareStatement("select * from LibraryDB");
 			result = statement.executeQuery();
@@ -288,9 +290,10 @@ public class LibraryApplet extends JApplet {
 			}
 			
 			b_no.setText("Total Books = " + bookCount + " (Book's)");
-			statement.close();
 			
-			statement = (PreparedStatement) con.prepareStatement("select * from users");
+			Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
+			PreparedStatement statement = (PreparedStatement) con.prepareStatement("SELECT * FROM `users`");
+			
 			result = statement.executeQuery();
 			
 			while (result.next())
@@ -304,7 +307,7 @@ public class LibraryApplet extends JApplet {
 			con.close();
 			
 		} catch (Exception der) {
-			b_no.setText("Error Occurs: \n" + der);
+			//b_no.setText("Error Occurs Here: \n" + der);
 		}
 		
 		b5.addActionListener(new ActionListener() {
@@ -430,89 +433,6 @@ public class LibraryApplet extends JApplet {
 
 			}
 		});
-		/*
-		item4.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					UIManager
-							.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-					SwingUtilities.updateComponentTreeUI(frame);
-				} catch (Exception dert) {
-					System.out.println(dert);
-				}
-			}
-		});
-
-		item5.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					UIManager
-							.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-					SwingUtilities.updateComponentTreeUI(frame);
-				} catch (Exception dert) {
-					System.out.println(dert);
-				}
-			}
-		});
-
-		item6.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					UIManager
-							.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-					SwingUtilities.updateComponentTreeUI(frame);
-				} catch (Exception dert) {
-					System.out.println(dert);
-				}
-			}
-		});
-
-		item61.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try {
-					Date d = new Date();
-					int my1 = d.getDate();
-					int my2 = d.getMonth();
-
-					FileDialog fd = new FileDialog(frame,
-							"Save Database Backup File (Library Management )");
-					fd.setMode(FileDialog.SAVE);
-					fd.setFile("Database" + my1 + "." + my2 + ".rar");
-					fd.setVisible(true);
-					String dir = fd.getDirectory();
-					String path = fd.getFile();
-
-					String command = "jar cvf Database1.rar Database/*.*";
-					Runtime r = Runtime.getRuntime();
-					r.exec(command);
-
-					String command2 = "jar cvf  Database2.rar Cust_Details/*.*";
-					Runtime r2 = Runtime.getRuntime();
-					r2.exec(command2);
-
-					try {
-						Thread.sleep(1000);
-					} catch (Exception fr) {
-					}
-					String command3 = "jar cvf " + dir + path
-							+ " Database1.rar  Database2.rar";
-					Runtime r3 = Runtime.getRuntime();
-					r3.exec(command3);
-
-					System.out.println("Database Backup Sucessfully!");
-
-				} catch (Exception dert) {
-					System.out.println(dert);
-				}
-			}
-		});
-
-		item612.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
-		*/
 		
 		b3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -856,7 +776,8 @@ public class LibraryApplet extends JApplet {
 						}
 						
 						try{
-							con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+							//con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");.
+							Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
 							
 							removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB WHERE bookname = ? " +
 							"AND author = ? AND publication = ? AND issuedate = ? AND rturndate = ? AND custid = ?");
@@ -1033,5 +954,12 @@ public class LibraryApplet extends JApplet {
 			}
 		});
 		
+		
+		
+		
+	}
+	public void SetLoginCustomer(String s)
+	{
+		loggedInCust = s;
 	}
 }
