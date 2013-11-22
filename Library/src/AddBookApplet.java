@@ -1,4 +1,7 @@
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JApplet;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -6,6 +9,7 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 
 import java.awt.BorderLayout;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.sql.Connection;
@@ -19,9 +23,12 @@ import com.mysql.jdbc.PreparedStatement;
 import com.mysql.jdbc.Statement;
 
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 
 
 public class AddBookApplet extends JApplet {
@@ -34,12 +41,9 @@ public class AddBookApplet extends JApplet {
 	//FileReader rd1;
 	JTextField read1;
 	//FileWriter wr1;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
 	private JTextField textField_4;
 	String bookname, author, publication, issDate, retDate, custid;
+	File f;
 	//Statement statement = null;
 	//private ResultSet result;
 	/**
@@ -60,67 +64,94 @@ public class AddBookApplet extends JApplet {
 		
 		l1 = new JLabel("Book Name");
 		l1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		l1.setBounds(10, 23, 72, 14);
+		l1.setBounds(10, 24, 100, 14);
 		panel.add(l1);
 		
 		t1 = new JTextField();
-		t1.setBounds(119, 21, 133, 20);
+		t1.setBounds(120, 22, 133, 20);
 		panel.add(t1);
 		t1.setColumns(10);
 		
 		l2 = new JLabel("Book Author");
 		l2.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		l2.setBounds(10, 64, 72, 14);
+		l2.setBounds(10, 64, 100, 14);
 		panel.add(l2);
 		
 		t2 = new JTextField();
 		t2.setColumns(10);
-		t2.setBounds(119, 62, 133, 20);
+		t2.setBounds(120, 62, 133, 20);
 		panel.add(t2);
 		
 		l3 = new JLabel("Book Publication");
 		l3.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		l3.setBounds(10, 102, 99, 14);
+		l3.setBounds(10, 104, 100, 14);
 		panel.add(l3);
 		
 		t3 = new JTextField();
 		t3.setColumns(10);
-		t3.setBounds(119, 100, 133, 20);
+		t3.setBounds(120, 102, 133, 20);
 		panel.add(t3);
 		
 		l4 = new JLabel("Book Issue Date");
 		l4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		l4.setBounds(10, 144, 99, 14);
+		l4.setBounds(10, 144, 100, 14);
 		panel.add(l4);
 		
 		t4 = new JTextField();
 		t4.setColumns(10);
-		t4.setBounds(119, 142, 133, 20);
+		t4.setBounds(120, 142, 133, 20);
 		panel.add(t4);
-		t4.setText("-");
+		t4.setText("");
 		
 		l5 = new JLabel("Book Details");
 		l5.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		l5.setBounds(10, 188, 72, 14);
+		l5.setBounds(10, 184, 100, 14);
 		panel.add(l5);
 		
 		textField_4 = new JTextField();
-		textField_4.setBounds(119, 186, 133, 56);
+		textField_4.setBounds(119, 182, 133, 70);
 		panel.add(textField_4);
 		textField_4.setColumns(10);
 		
+		//added
+		l6 = new JLabel("Cover Image");
+		l6.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		l6.setBounds(10, 272, 100, 14);
+		panel.add(l6);
+				
+		t6 = new JTextField();
+		t6.setBounds(119, 272, 133, 20);
+		panel.add(t6);
+				
+		// ***l7 => Cover Image****
+		l7 = new JLabel();
+		l7.setBounds(262, 47, 140, 215);
+		panel.add(l7);
+				
+		b4 = new JButton("Browse");
+		b4.setBounds(262, 272, 89, 23);
+		panel.add(b4);
+				
+		l6 = new JLabel("Image Preview:");
+		l6.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		l6.setBounds(262, 24, 100, 14);
+		l6.setVisible(false);
+		panel.add(l6);
+		//end add
+				
+		//moved buttons lower
 		b1 = new JButton("Save");
-		b1.setBounds(10, 266, 89, 23);
+		b1.setBounds(10, 312, 89, 23);
 		panel.add(b1);
-		
+				
 		b2 = new JButton("Reset");
-		b2.setBounds(121, 266, 89, 23);
+		b2.setBounds(121, 312, 89, 23);
 		panel.add(b2);
-		
+				
 		b3 = new JButton("Cancel");
-		b3.setBounds(231, 266, 89, 23);
+		b3.setBounds(231, 312, 89, 23);
 		panel.add(b3);
-		
+		//end changes		
 		
 		
 		b1.addActionListener(new ActionListener() {
@@ -197,7 +228,39 @@ public class AddBookApplet extends JApplet {
 				add("Center", library);
 			}
 		});
+		
+		//added
+		// source: http://stackoverflow.com/questions/14142932/gui-with-java-gui-builder-for-uploading-an-image-and-displaying-to-a-panelinsid
+		b4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.showOpenDialog(null);
+				f = chooser.getSelectedFile();
+				String filename = f.getAbsolutePath();
+				t6.setText(filename);
+				try {
+					ImageIcon ii=new ImageIcon(scaleImage(140, 215, ImageIO.read(new File(f.getAbsolutePath()))));
+					l7.setIcon(ii);
+					l6.setVisible(true);
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		//end add
 
 	}
-
+	//added
+	// source: http://stackoverflow.com/questions/14142932/gui-with-java-gui-builder-for-uploading-an-image-and-displaying-to-a-panelinsid
+		public static BufferedImage scaleImage(int w, int h, BufferedImage img) throws Exception {
+		    BufferedImage bi;
+		    bi = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
+		    Graphics2D g2d = (Graphics2D) bi.createGraphics();
+		    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		    g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+		    g2d.drawImage(img, 0, 0, w, h, null);
+		    g2d.dispose();
+		    return bi;
+		}
+		//end add
 }

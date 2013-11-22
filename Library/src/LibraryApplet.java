@@ -78,6 +78,7 @@ public class LibraryApplet extends JApplet {
 	private ArrayList userFirstNames = new ArrayList();
 	private ArrayList userLastNames = new ArrayList();
 	private ArrayList regDates = new ArrayList();
+	private static final int LEFT_SIDE = 524;
 	
 	/**
 	 * Create the applet.
@@ -172,7 +173,7 @@ public class LibraryApplet extends JApplet {
 		panel.add(list6);
 		
 		JPanel jp2 = new JPanel();
-		jp2.setBounds(524, 25, 141, 122);
+		jp2.setBounds(LEFT_SIDE, 20, 160, 145);
 		panel.add(jp2);
 		
 		b1 = new JButton("Add Book");
@@ -196,7 +197,7 @@ public class LibraryApplet extends JApplet {
 		
 		JPanel jp3 = new JPanel();
 		jp3.setBackground(SystemColor.activeCaptionBorder);
-		jp3.setBounds(524, 158, 141, 122);
+		jp3.setBounds(LEFT_SIDE, 158, 160, 140);
 		panel.add(jp3);
 		
 		t1 = new JTextField();
@@ -217,7 +218,7 @@ public class LibraryApplet extends JApplet {
 		
 		JPanel jp4 = new JPanel();
 		jp4.setBackground(SystemColor.activeCaptionBorder);
-		jp4.setBounds(524, 291, 141, 184);
+		jp4.setBounds(LEFT_SIDE, 293, 160, 200);
 		panel.add(jp4);
 		
 		b15 = new JButton("Add Customer");
@@ -246,11 +247,12 @@ public class LibraryApplet extends JApplet {
 		
 		progress1 = new JProgressBar();
 		progress1.setBackground(Color.GREEN);
-		progress1.setBounds(524, 486, 141, 25);
-		panel.add(progress1);
+		progress1.setBounds(LEFT_SIDE, 486, 141, 25);
+		//panel.add(progress1);
 		
 		JButton btnLogout = new JButton("Logout");
-		btnLogout.setBounds(553, 530, 89, 23);
+		// 553 530
+		btnLogout.setBounds(LEFT_SIDE + 29, 502, 89, 25);
 		panel.add(btnLogout);
 		
 		for (int x = 1; x < 100; x++) {
@@ -868,7 +870,7 @@ public class LibraryApplet extends JApplet {
 							read1.read(rd1, null);
 							if (!read1.getText().equals("")) {
 								ak47.setText(ak47.getText() + "\n"
-										+ "Book Name :" + read1.getText());
+										+ "Book Name: " + read1.getText());
 								rd1.close();
 
 								rd1 = new FileReader("Database/" + i
@@ -876,7 +878,7 @@ public class LibraryApplet extends JApplet {
 								read1 = new JTextField();
 								read1.read(rd1, null);
 								ak47.setText(ak47.getText() + "\n"
-										+ "Book Author :" + read1.getText());
+										+ "Book Author: " + read1.getText());
 								rd1.close();
 
 								rd1 = new FileReader("Database/" + i
@@ -884,7 +886,7 @@ public class LibraryApplet extends JApplet {
 								read1 = new JTextField();
 								read1.read(rd1, null);
 								ak47.setText(ak47.getText() + "\n"
-										+ "Book Publication :"
+										+ "Book Publication: "
 										+ read1.getText());
 								rd1.close();
 
@@ -893,10 +895,10 @@ public class LibraryApplet extends JApplet {
 								read1.read(rd1, null);
 								if (!read1.getText().equals("")) {
 									ak47.setText(ak47.getText() + "\n"
-											+ "Issue Date :" + read1.getText());
+											+ "Issue Date: " + read1.getText());
 								} else {
 									ak47.setText(ak47.getText() + "\n"
-											+ "Issue Date : None");
+											+ "Issue Date: None");
 								}
 								rd1.close();
 
@@ -905,14 +907,14 @@ public class LibraryApplet extends JApplet {
 								read1 = new JTextField();
 								read1.read(rd1, null);
 								ak47.setText(ak47.getText() + "\n"
-										+ "Return Date :" + read1.getText());
+										+ "Return Date: " + read1.getText());
 								rd1.close();
 
 								rd1 = new FileReader("Database/" + i + ".id");
 								read1 = new JTextField();
 								read1.read(rd1, null);
 								ak47.setText(ak47.getText() + "\n"
-										+ "Cust. Id :" + read1.getText());
+										+ "Cust. Id: " + read1.getText());
 								rd1.close();
 
 								rd1 = new FileReader("Database/" + i
@@ -921,11 +923,11 @@ public class LibraryApplet extends JApplet {
 								read1.read(rd1, null);
 								if (!read1.getText().equals("")) {
 									ak47.setText(ak47.getText() + "\n"
-											+ "Other Details : \n"
+											+ "Other Details: \n"
 											+ read1.getText());
 								} else {
 									ak47.setText(ak47.getText() + "\n"
-											+ "Other Details : Not Found");
+											+ "Other Details: Not Found");
 								}
 								rd1.close();
 
