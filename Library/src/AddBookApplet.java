@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 
@@ -42,8 +43,9 @@ public class AddBookApplet extends JApplet {
 	JTextField read1;
 	//FileWriter wr1;
 	private JTextField textField_4;
-	String bookname, author, publication, issDate, retDate, custid;
-	File f;
+	private static ArrayList<JLabel> images = new ArrayList<JLabel>();
+	String bookname, author, publication, issDate, retDate, custid, image, pdf;
+	File f, f1;
 	//Statement statement = null;
 	//private ResultSet result;
 	/**
@@ -92,64 +94,63 @@ public class AddBookApplet extends JApplet {
 		t3.setBounds(120, 102, 133, 20);
 		panel.add(t3);
 		
-		l4 = new JLabel("Book Issue Date");
-		l4.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		l4.setBounds(10, 144, 100, 14);
-		panel.add(l4);
-		
-		t4 = new JTextField();
-		t4.setColumns(10);
-		t4.setBounds(120, 142, 133, 20);
-		panel.add(t4);
-		t4.setText("");
-		
-		l5 = new JLabel("Book Details");
-		l5.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		l5.setBounds(10, 184, 100, 14);
-		panel.add(l5);
-		
-		textField_4 = new JTextField();
-		textField_4.setBounds(119, 182, 133, 70);
-		panel.add(textField_4);
-		textField_4.setColumns(10);
-		
 		//added
 		l6 = new JLabel("Cover Image");
 		l6.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		l6.setBounds(10, 272, 100, 14);
+		l6.setBounds(10, 144, 100, 14);
 		panel.add(l6);
 				
 		t6 = new JTextField();
-		t6.setBounds(119, 272, 133, 20);
+		t6.setBounds(120, 142, 133, 20);
 		panel.add(t6);
 				
 		// ***l7 => Cover Image****
 		l7 = new JLabel();
-		l7.setBounds(262, 47, 140, 215);
+		l7.setBounds(362, 33, 140, 215);
 		panel.add(l7);
 				
 		b4 = new JButton("Browse");
-		b4.setBounds(262, 272, 89, 23);
+		b4.setBounds(262, 142, 89, 25);
 		panel.add(b4);
 				
 		l6 = new JLabel("Image Preview:");
 		l6.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		l6.setBounds(262, 24, 100, 14);
+		l6.setBounds(362, 10, 100, 14);
 		l6.setVisible(false);
 		panel.add(l6);
 		//end add
+		
+		
+		
+		l4 = new JLabel("PDF File");
+		l4.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		l4.setBounds(10, 184, 100, 14);
+		panel.add(l4);
+		
+		t4 = new JTextField();
+		t4.setColumns(10);
+		t4.setBounds(120, 182, 133, 20);
+		panel.add(t4);
+		t4.setText("");
+		
+		b5 = new JButton("Browse");
+		b5.setBounds(262, 182, 89, 25);
+		panel.add(b5);
 				
+		
+		
+		
 		//moved buttons lower
 		b1 = new JButton("Save");
-		b1.setBounds(10, 312, 89, 23);
+		b1.setBounds(10, 222, 89, 25);
 		panel.add(b1);
 				
 		b2 = new JButton("Reset");
-		b2.setBounds(121, 312, 89, 23);
+		b2.setBounds(121, 222, 89, 25);
 		panel.add(b2);
 				
 		b3 = new JButton("Cancel");
-		b3.setBounds(231, 312, 89, 23);
+		b3.setBounds(231, 222, 89, 25);
 		panel.add(b3);
 		//end changes		
 		
@@ -161,9 +162,11 @@ public class AddBookApplet extends JApplet {
 					bookname = t1.getText();
 					author = t2.getText();
 					publication = t3.getText();
-					issDate = t4.getText();
+					issDate = "-";
 					retDate = "-";
 					custid = "-";
+					image = t6.getText();
+					pdf = t4.getText();
 					try{
 						Class.forName("com.mysql.jdbc.Driver").newInstance();
 						
@@ -173,17 +176,23 @@ public class AddBookApplet extends JApplet {
 
 						PreparedStatement statement = null; 
 								statement = (PreparedStatement) con.prepareStatement("INSERT INTO " +
-										"LibraryDB(bookname, author, publication, issuedate, rturndate, custid) " +
-										"VALUES(?, ?, ?, ?, ?, ?)");
+										"LibraryDB(bookname, author, publication, issuedate, rturndate, custid, image, pdf) " +
+										"VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
 						statement.setString(1, bookname);
 						statement.setString(2, author);
 						statement.setString(3, publication);
 						statement.setString(4, issDate);
 						statement.setString(5, retDate);
 						statement.setString(6, custid);
+						statement.setString(7, image);
+						statement.setString(8, pdf);
 						statement.executeUpdate();
 						statement.close();
 						con.close();
+						
+						/*
+						images.add(l7);
+						*/
 						
 						LibraryApplet library = new LibraryApplet();
 						library.init();
@@ -191,6 +200,7 @@ public class AddBookApplet extends JApplet {
 						panel.setVisible(false);
 						setLayout(new BorderLayout(800, 600));
 						add("Center", library);
+						
 						
 					}
 					catch (SQLException e1){
@@ -214,7 +224,7 @@ public class AddBookApplet extends JApplet {
 				t2.setText("");
 				t3.setText("");
 				t4.setText("");
-				a1.setText("");
+				t6.setText("");
 			}
 		});
 
@@ -248,6 +258,18 @@ public class AddBookApplet extends JApplet {
 			}
 		});
 		//end add
+		
+		//Added by Zach. Button to get the chosen file and put its name in the text field.
+		//this name is used by the pdfviewer to display the file.
+		b5.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.showOpenDialog(null);
+				f1 = chooser.getSelectedFile();
+				String filename = f1.getAbsolutePath();
+				t4.setText(filename);
+			}
+		});
 
 	}
 	//added
@@ -263,4 +285,17 @@ public class AddBookApplet extends JApplet {
 		    return bi;
 		}
 		//end add
+		
+		/*
+		public static JLabel getImage(int index){
+			return images.get(index);
+		}
+		
+		public static void deleteImage(int index){
+			images.remove(index);
+		}
+		*/
+		
+		
+		
 }

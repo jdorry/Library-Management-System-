@@ -1,3 +1,4 @@
+import javax.imageio.ImageIO;
 import javax.swing.JApplet;
 import javax.swing.JInternalFrame;
 
@@ -6,12 +7,15 @@ import java.awt.Button;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.FileDialog;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 import javax.swing.Box;
 
 import java.awt.Dimension;
 
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -40,6 +44,8 @@ import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.sql.DriverManager;
@@ -47,7 +53,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-
+//added by Zach, for the pdf viewer.
+import org.jpedal.examples.viewer.Viewer;
+import org.jpedal.examples.viewer.gui.SwingGUI;
 
 public class LibraryApplet extends JApplet {
 
@@ -74,12 +82,20 @@ public class LibraryApplet extends JApplet {
 	private ArrayList issueDates = new ArrayList();
 	private ArrayList returnDates = new ArrayList();
 	private ArrayList custIDs = new ArrayList();
-	private ArrayList userIDs = new ArrayList();
+	private ArrayList images = new ArrayList();
+	private ArrayList pdfs = new ArrayList();
+	
+	private ArrayList usernames = new ArrayList();
+	private ArrayList passwords = new ArrayList();
 	private ArrayList userFirstNames = new ArrayList();
 	private ArrayList userLastNames = new ArrayList();
+	private ArrayList userIDs = new ArrayList();
 	private ArrayList regDates = new ArrayList();
-	private static final int LEFT_SIDE = 524;
+	private static final int LEFT_SIDE = 590;
 	private int bookCount;
+	private String pdfDirect;
+	private String imageDirect;
+	private static int currentID = 0000;
 	
 	/**
 	 * Create the applet.
@@ -105,14 +121,15 @@ public class LibraryApplet extends JApplet {
 		}
 		
 		panel = new JPanel();
-		panel.setBackground(SystemColor.info);
+		Color gold = new Color(255, 179, 16);
+		panel.setBackground(gold);
 		getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
 		panel.setBounds(9,10,675,515);
 		
 		Color re = new Color(122, 145, 201);
 		Color r = new Color(98, 188, 210);
-		Color m = new Color(139, 0, 0);
+		Color m = new Color(153, 0, 51);
 		int h = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
 		int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
 		
@@ -120,8 +137,8 @@ public class LibraryApplet extends JApplet {
 		list1 = new JList(mo1);
 		ml1 = new JLabel("Title");
 		ml1.setForeground(m);
-		ml1.setBounds(10, 11, 65, 14);
-		list1.setBounds(10, 25, 99, 414);
+		ml1.setBounds(15, 0, 154, 20);
+		list1.setBounds(15, 20, 154, 500);
 		list1.setToolTipText("Name of Books Present in Database");
 		panel.add(list1);
 		panel.add(ml1);
@@ -130,9 +147,9 @@ public class LibraryApplet extends JApplet {
 		list2 = new JList(mo2);
 		ml2 = new JLabel("Author");
 		ml2.setForeground(m);
-		ml2.setBounds(119, 8, 99, 20);
+		ml2.setBounds(140 + 30, 0, 99, 20);
 		list2.setToolTipText("Name of Book Authors Present in Database");
-		list2.setBounds(109, 25, 99, 414);
+		list2.setBounds(140 + 30, 20, 99, 500);
 		panel.add(list2);
 		panel.add(ml2);
 		
@@ -140,39 +157,39 @@ public class LibraryApplet extends JApplet {
 		list3 = new JList(mo3);
 		ml3 = new JLabel("Publication");
 		ml3.setForeground(m);
-		ml3.setBounds(218, 8, 99, 20);
+		ml3.setBounds(240 + 30, 0, 99, 20);
 		list3.setToolTipText("Name of Books Publication Present in Database");
-		list3.setBounds(208, 25, 99, 414);
+		list3.setBounds(240 + 30, 20, 99, 500);
 		panel.add(ml3);
 		panel.add(list3);
 
 		mo4 = new DefaultListModel();
 		list4 = new JList(mo4);
-		ml4 = new JLabel("  Issue Date");
+		ml4 = new JLabel("Issued");
 		ml4.setForeground(m);
-		ml4.setBounds(307, 8, 70, 20);
+		ml4.setBounds(340 + 30, 0, 70, 20);
 		list4.setToolTipText("Date of Issue Present in Database");
-		list4.setBounds(307, 25, 70, 414);
+		list4.setBounds(340 + 30, 20, 70, 500);
 		panel.add(ml4);
 		panel.add(list4);
 
 		mo5 = new DefaultListModel();
 		list5 = new JList(mo5);
-		ml5 = new JLabel("   Return Date");
+		ml5 = new JLabel("Returned");
 		ml5.setForeground(m);
-		ml5.setBounds(377, 8, 70, 20);
+		ml5.setBounds(411 + 30, 0, 70, 20);
 		list5.setToolTipText("Date of Return Present in Database");
-		list5.setBounds(377, 25, 70, 414);
+		list5.setBounds(411 + 30, 20, 70, 500);
 		panel.add(ml5);
 		panel.add(list5);
 
 		mo6 = new DefaultListModel();
 		list6 = new JList(mo6);
-		ml6 = new JLabel("   Cust. ID");
+		ml6 = new JLabel("Cust. ID");
 		ml6.setForeground(m);
-		ml6.setBounds(447, 8, 60, 20);
-		list6.setToolTipText("ID of customer that purchased the book last time ");
-		list6.setBounds(447, 25, 60, 414);
+		ml6.setBounds(482 + 30, 0, 60, 20);
+		list6.setToolTipText("ID of customer that borrowed the book last time ");
+		list6.setBounds(482 + 30, 20, 60, 500);
 		panel.add(ml6);
 		panel.add(list6);
 		
@@ -240,7 +257,7 @@ public class LibraryApplet extends JApplet {
 		jp4.add(t2);
 		t2.setColumns(10);
 		
-		b7 = new JButton("Search Customer");
+		b7 = new JButton("Search Customers");
 		jp4.add(b7);
 		
 		b_no = new JLabel();
@@ -291,22 +308,29 @@ public class LibraryApplet extends JApplet {
 				returnDates.add(result.getString(5));
 				mo6.addElement(result.getString(6));
 				custIDs.add(result.getString(6));
+				
+				images.add(result.getString(7));
+				pdfs.add(result.getString(8));
 				bookCount++;
 			}
 			
-			b_no.setText("Total Books = " + bookCount + " (Books)");
+			b_no.setText("Total Books = " + bookCount + " Books");
 			
 			Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
 			PreparedStatement statement = (PreparedStatement) con.prepareStatement("SELECT * FROM `users`");
 			
 			result = statement.executeQuery();
 			
+			currentID = 0000;
 			while (result.next())
 			{
+				usernames.add(result.getString(1));
+				passwords.add(result.getString(2));
 				userIDs.add(result.getString(5));
 				userFirstNames.add(result.getString(3));
 				userLastNames.add(result.getString(4));
 				regDates.add(result.getString(6));
+				currentID++;
 			}
 			statement.close();
 			con.close();
@@ -326,12 +350,12 @@ public class LibraryApplet extends JApplet {
 				try {
 					int bs1 = 0;
 					
-					ml1.setText("Book Name");
+					ml1.setText("Title");
 					ml2.setText("Author");
 					ml3.setText("Publication");
-					ml4.setText("Issue Date");
-					ml5.setText("Return Date");
-					ml6.setText("Cust. ID.");
+					ml4.setText("Issued");
+					ml5.setText("Returned");
+					ml6.setText("Cust. ID");
 					
 					progress1.setValue(0);
 					mo1.removeAllElements();
@@ -358,7 +382,7 @@ public class LibraryApplet extends JApplet {
 							}
 						}
 						if(bookFound)
-							b_no.setText("Total Books = " + bookCount + " (Book's)");
+							b_no.setText("Total Books = " + bookCount + " Books");
 						else
 							b_no.setText("Book not found.");
 						
@@ -366,7 +390,7 @@ public class LibraryApplet extends JApplet {
 					} 
 					else {
 						progress1.setValue(0);
-						b_no.setText("Please Enter the Book Name or Publcation");
+						b_no.setText("Please Enter the Book Name or Publication");
 					}
 
 				} catch (Exception der) {
@@ -381,7 +405,9 @@ public class LibraryApplet extends JApplet {
 			public void actionPerformed(ActionEvent e) {
 
 			int listIndex, arrayIndex, i, customerCount, deleteSuccess;
-			String removeCustName, firstLastName;
+			String removeCustID;
+			//String removeCustName, firstLastName;
+			
 			arrayIndex = 0;
 			customerCount = 0;
 			deleteSuccess = 0;
@@ -389,7 +415,7 @@ public class LibraryApplet extends JApplet {
 			try {
 				if (ml1.getText() != null) {
 						listIndex = list1.getSelectedIndex();
-						removeCustName = (String) mo1.getElementAt(listIndex);
+						removeCustID = (String) mo1.getElementAt(listIndex);
 
 						mo1.removeAllElements();
 						mo2.removeAllElements();
@@ -399,7 +425,7 @@ public class LibraryApplet extends JApplet {
 						mo6.removeAllElements();
 
 						for(i = 0; i < userIDs.size(); i++) {
-							if(userIDs.get(i).equals(removeCustName)) {
+							if(userIDs.get(i).equals(removeCustID)) {
 								arrayIndex = i;
 							}
 						}
@@ -408,9 +434,15 @@ public class LibraryApplet extends JApplet {
 							//con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");.
 							Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
 
-							removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM users WHERE ID = ? ");
+							removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM users WHERE username = ? " +
+							"AND password = ? AND custfirstname = ? AND custlastname = ? AND ID = ? AND regdate = ?");
 
-							removeStatement.setString(1, (String) userIDs.get(arrayIndex));
+							removeStatement.setString(1, (String) usernames.get(arrayIndex));
+							removeStatement.setString(2, (String) passwords.get(arrayIndex));
+							removeStatement.setString(3, (String) userFirstNames.get(arrayIndex));
+							removeStatement.setString(4, (String) userLastNames.get(arrayIndex));
+							removeStatement.setString(5, (String) userIDs.get(arrayIndex));
+							removeStatement.setString(6, (String) regDates.get(arrayIndex));
 
 							deleteSuccess = removeStatement.executeUpdate();
 
@@ -420,29 +452,14 @@ public class LibraryApplet extends JApplet {
 							e1.printStackTrace();
 						}
 						
-						System.out.println("1");
-						
-						userIDs.remove(arrayIndex);
+						usernames.remove(arrayIndex);
+						passwords.remove(arrayIndex);
 						userFirstNames.remove(arrayIndex);
-						System.out.println("4");
 						userLastNames.remove(arrayIndex);
-						System.out.println("5");
+						userIDs.remove(arrayIndex);
 						regDates.remove(arrayIndex);
-						System.out.println("6");
-			
-						System.out.println("7");
-						//issueDates.remove(arrayIndex);
 						
-						
-						//returnDates.remove(arrayIndex);
-						//fix***
-						//custIDs.remove(arrayIndex);
-						//fix
-						//bookNames.remove(arrayIndex);
-						
-						
-						System.out.println("2");
-						for(i = 0; i < userIDs.size(); i++) {
+						/*for(i = 0; i < userIDs.size(); i++) {
 							mo1.addElement(userIDs.get(i));
 							firstLastName = userFirstNames.get(i) + " " + userLastNames.get(i);
 							mo2.addElement(firstLastName);
@@ -457,13 +474,23 @@ public class LibraryApplet extends JApplet {
 								}
 
 							}
+						}*/
+						for(i = 0; i < userIDs.size(); i++)
+						{
+							mo1.addElement(userIDs.get(i));
+							String userName = userFirstNames.get(i) + " " + userLastNames.get(i);
+							mo2.addElement(userName);
+							mo3.addElement(regDates.get(i));
+							mo4.addElement("");
+							mo5.addElement("");
+							mo6.addElement("");
+							bookCount++;
 						}
-						System.out.println("3");
-						b_no.setText("Total Customers = " + customerCount + " Customers");
+						//b_no.setText("Total Customers = " + customerCount + " Customers");
 				}
 			}
 			catch (Exception fr) {
-				System.out.println("Exception");
+				System.out.println("Exception: " + fr);
 			}
 
 			}
@@ -483,12 +510,12 @@ public class LibraryApplet extends JApplet {
 					int bs2 = 0;
 					progress1.setValue(0);
 					
-					ml1.setText("Book Name");
+					ml1.setText("Title");
 					ml2.setText("Author");
 					ml3.setText("Publication");
-					ml4.setText("Issue Date");
-					ml5.setText("Return Date");
-					ml6.setText("Cust. ID.");
+					ml4.setText("Issued");
+					ml5.setText("Returned");
+					ml6.setText("Cust. ID");
 					
 					mo1.removeAllElements();
 					mo2.removeAllElements();
@@ -514,7 +541,7 @@ public class LibraryApplet extends JApplet {
 							}
 						}
 						if(bookFound)
-							b_no.setText("Total Books = " + bookCount + " (Book's)");
+							b_no.setText("Total Books = " + bookCount + " Books");
 						else
 							b_no.setText("Book not found.");
 						
@@ -575,12 +602,12 @@ public class LibraryApplet extends JApplet {
 				
 				try {
 					
-					ml1.setText("Book Name");
+					ml1.setText("Title");
 					ml2.setText("Author");
 					ml3.setText("Publication");
-					ml4.setText("Issue Date");
-					ml5.setText("Return Date");
-					ml6.setText("Cust. ID.");
+					ml4.setText("Issued");
+					ml5.setText("Returned");
+					ml6.setText("Cust. ID");
 					
 					mo1.removeAllElements();
 					mo2.removeAllElements();
@@ -599,7 +626,7 @@ public class LibraryApplet extends JApplet {
 						mo6.addElement(custIDs.get(i));
 						bookCount++;
 					}
-					b_no.setText("Total Books = " + bookCount + " (Book's)");
+					b_no.setText("Total Books = " + bookCount + " Books");
 					
 				} catch (Exception der) {
 					b_no.setText("Error Occurs: \n" + der);
@@ -622,12 +649,12 @@ public class LibraryApplet extends JApplet {
 					
 					
 					
-					ml1.setText("Cust. ID");
+					ml1.setText("Customer ID");
 					ml2.setText("Cust. Name");
 					ml3.setText("Reg. Date");
-					ml4.setText("Book Name");
-					ml5.setText("Purchase Date");
-					ml6.setText("Return Date");
+					ml4.setText("Book");
+					ml5.setText("Issued");
+					ml6.setText("Returned");
 
 					mo1.removeAllElements();
 					mo2.removeAllElements();
@@ -697,9 +724,9 @@ public class LibraryApplet extends JApplet {
 						ml1.setText("Cust. ID");
 						ml2.setText("Cust. Name");
 						ml3.setText("Registration Date");
-						ml4.setText("Book Name");
+						ml4.setText("Book");
 						ml5.setText("Purchase Date");
-						ml6.setText("Return Date");
+						ml6.setText("Returned");
 						*/
 						mo1.removeAllElements();
 						mo2.removeAllElements();
@@ -707,7 +734,9 @@ public class LibraryApplet extends JApplet {
 						mo4.removeAllElements();
 						mo5.removeAllElements();
 						mo6.removeAllElements();
-
+						
+						
+						/*
 						rd2 = new FileReader("Cust_Details/pointer.mmm");
 						jt2 = new JTextField();
 						jt2.read(rd2, null);
@@ -767,8 +796,11 @@ public class LibraryApplet extends JApplet {
 								mo6.addElement(jt2.getText() + "   _");
 							}
 							rd2.close();
-						}
-					} catch (Exception fg) {
+						}*/
+						
+					}
+					catch (Exception fg) {
+						System.out.println("Exception: " + fg);
 					}
 				}
 
@@ -786,12 +818,12 @@ public class LibraryApplet extends JApplet {
 					try {
 						int bs1 = 0;
 						
-						ml1.setText("Cust. ID");
+						ml1.setText("Customer ID");
 						ml2.setText("Cust. Name");
 						ml3.setText("Reg. Date");
-						ml4.setText("Book Name");
-						ml5.setText("Purchase Date");
-						ml6.setText("Return Date");
+						ml4.setText("Book");
+						ml5.setText("Issued");
+						ml6.setText("Returned");
 						
 						progress1.setValue(0);
 						mo1.removeAllElements();
@@ -805,7 +837,7 @@ public class LibraryApplet extends JApplet {
 							
 							searchID = t2.getText();
 							
-							for(int i = 0; i < custIDs.size(); i++)
+							for(int i = 0; i < userIDs.size(); i++)
 							{
 								if(userIDs.get(i).equals(searchID))
 								{
@@ -813,6 +845,10 @@ public class LibraryApplet extends JApplet {
 									firstLastName = userFirstNames.get(i) + " " + userLastNames.get(i);
 									mo2.addElement(firstLastName);
 									mo3.addElement(regDates.get(i));
+									mo4.addElement("");
+									mo5.addElement("");
+									mo6.addElement("");
+									/*
 									for(int j = 0; j < custIDs.size(); j++)
 									{
 										if(custIDs.get(i).equals(searchID) && !match)
@@ -824,7 +860,7 @@ public class LibraryApplet extends JApplet {
 										}
 										
 										
-									}
+									}*/
 
 								}
 								
@@ -833,7 +869,7 @@ public class LibraryApplet extends JApplet {
 						} 
 						else {
 							progress1.setValue(0);
-							b_no.setText("Please Enter the Book Name or Publcation");
+							b_no.setText("Please Enter the Book Name or Publication");
 						}
 
 					} catch (Exception der) {
@@ -893,7 +929,7 @@ public class LibraryApplet extends JApplet {
 							Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
 							
 							removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM LibraryDB WHERE bookname = ? " +
-							"AND author = ? AND publication = ? AND issuedate = ? AND rturndate = ? AND custid = ?");
+							"AND author = ? AND publication = ? AND issuedate = ? AND rturndate = ? AND custid = ? AND image = ? AND pdf = ?");
 							
 							removeStatement.setString(1, (String) bookNames.get(arrayIndex));
 							removeStatement.setString(2, (String) authors.get(arrayIndex));
@@ -901,6 +937,8 @@ public class LibraryApplet extends JApplet {
 							removeStatement.setString(4, (String) issueDates.get(arrayIndex));
 							removeStatement.setString(5, (String) returnDates.get(arrayIndex));
 							removeStatement.setString(6, (String) custIDs.get(arrayIndex));
+							removeStatement.setString(6, (String) images.get(arrayIndex));
+							removeStatement.setString(6, (String) pdfs.get(arrayIndex));
 							
 							deleteSuccess = removeStatement.executeUpdate();
 						} catch (SQLException e1) {
@@ -913,6 +951,8 @@ public class LibraryApplet extends JApplet {
 						issueDates.remove(arrayIndex);
 						returnDates.remove(arrayIndex);
 						custIDs.remove(arrayIndex);
+						images.remove(arrayIndex);
+						pdfs.remove(arrayIndex);
 						
 						for(i = 0; i < bookNames.size(); i ++)
 						{
@@ -924,7 +964,7 @@ public class LibraryApplet extends JApplet {
 							mo6.addElement(custIDs.get(i));
 							bookCount++;
 						}
-						b_no.setText("Total Books = " + bookCount + " (Books)");
+						b_no.setText("Total Books = " + bookCount + " Books");
 					}
 				} catch (Exception fr) {
 				}
@@ -953,29 +993,68 @@ public class LibraryApplet extends JApplet {
 					
 					//added
 					boolean bookFound = false;
+
 					
 					for(int i = 0; i < bookNames.size(); i++) {
 						if(bookNames.get(i).equals(str34)) {
-							ak47.setText(ak47.getText() + "\n" + "Book Name: " + bookNames.get(i));
-							ak47.setText(ak47.getText() + "\n" + "Book Author: " + authors.get(i));
-							ak47.setText(ak47.getText() + "\n" + "Book Publication:  " + publications.get(i));
+							ak47.setText(ak47.getText() + "\n" + "Title: " + bookNames.get(i));
+							ak47.setText(ak47.getText() + "\n" + "Author: " + authors.get(i));
+							ak47.setText(ak47.getText() + "\n" + "Publication:  " + publications.get(i));
 							ak47.setText(ak47.getText() + "\n" + "Issue Date: " + issueDates.get(i));
 							ak47.setText(ak47.getText() + "\n" + "Return Date: " + returnDates.get(i));
-							ak47.setText(ak47.getText() + "\n" + "Cust. Id: " + custIDs.get(i));
+							ak47.setText(ak47.getText() + "\n" + "Cust. ID: " + custIDs.get(i));
+							imageDirect = (String) images.get(i);
+							pdfDirect = (String) pdfs.get(i);
+
+							JLabel coverText = new JLabel("Cover: ");
+							coverText.setBounds(270, 10, 133, 20);
+							jf55.add(coverText);
 							
-							/*
-							JLabel temp = AddBookApplet.getImage(i);
-							jf55.add(temp);
-							*/
+							JLabel l7 = new JLabel();
+							l7.setBounds(270, 33, 140, 215);
+							jf55.add(l7);
+							
+							if(imageDirect.equals("")){
+								ImageIcon ii=new ImageIcon(scaleImage(140, 215, ImageIO.read(new File("/Users/Jorgensen/Developer/Library Mangement/no-image.jpg"))));
+								l7.setIcon(ii);
+							}
+							else{
+								File f = new File(imageDirect);
+								try {
+									ImageIcon ii=new ImageIcon(scaleImage(140, 215, ImageIO.read(new File(f.getAbsolutePath()))));
+									l7.setIcon(ii);
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							}
+							
+							
 							bookFound = true;
 						}
 					}
 					
+
+					//Added by Zach.
+					JButton pdfButton = new JButton("View PDF");
+					pdfButton.setBounds(140, 270, 89, 25);
+					pdfButton.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							if(pdfDirect != null){
+									PDFviewer viewframe = new PDFviewer(pdfDirect);
+									viewframe.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+									viewframe.pack();
+									viewframe.setVisible(true);
+								}
+						}
+					});
+					if(!pdfDirect.equals("")){
+						jf55.add(pdfButton);
+					}
 					
 					//end add 
 
 					Button b1 = new Button("Ok");
-					b1.setBounds(80, 270, 100, 25);
+					b1.setBounds(30, 270, 100, 25);
 					jf55.add(b1);
 					b1.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
@@ -984,94 +1063,7 @@ public class LibraryApplet extends JApplet {
 					});
 
 					// bounds of book details screen
-					jf55.setSize(300, 335);
-
-					/*
-					rd2 = new FileReader("Database/pointer.mmm");
-					jt2 = new JTextField();
-					jt2.read(rd2, null);
-					rd2.close();
-					int nov = Integer.parseInt(jt2.getText());
-					
-					
-					for (int i = 1; i < nov; i++) {
-						rd1 = new FileReader("Database/" + i + ".name");
-						read1 = new JTextField();
-						read1.read(rd1, null);
-						String hj = read1.getText();
-						rd1.close();
-
-						if (hj.equals(str34)) {
-							rd1 = new FileReader("Database/" + i + ".name");
-							read1 = new JTextField();
-							read1.read(rd1, null);
-							if (!read1.getText().equals("")) {
-								ak47.setText(ak47.getText() + "\n"
-										+ "Book Name: " + read1.getText());
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + i
-										+ ".author");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								ak47.setText(ak47.getText() + "\n"
-										+ "Book Author: " + read1.getText());
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + i
-										+ ".publication");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								ak47.setText(ak47.getText() + "\n"
-										+ "Book Publication: "
-										+ read1.getText());
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + i + ".issue");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								if (!read1.getText().equals("")) {
-									ak47.setText(ak47.getText() + "\n"
-											+ "Issue Date: " + read1.getText());
-								} else {
-									ak47.setText(ak47.getText() + "\n"
-											+ "Issue Date: None");
-								}
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + i
-										+ ".return");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								ak47.setText(ak47.getText() + "\n"
-										+ "Return Date: " + read1.getText());
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + i + ".id");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								ak47.setText(ak47.getText() + "\n"
-										+ "Cust. Id: " + read1.getText());
-								rd1.close();
-
-								rd1 = new FileReader("Database/" + i
-										+ ".detail");
-								read1 = new JTextField();
-								read1.read(rd1, null);
-								if (!read1.getText().equals("")) {
-									ak47.setText(ak47.getText() + "\n"
-											+ "Other Details: \n"
-											+ read1.getText());
-								} else {
-									ak47.setText(ak47.getText() + "\n"
-											+ "Other Details: Not Found");
-								}
-								rd1.close();
-
-							}
-						}
-					}
-					*/
+					jf55.setSize(420, 340);
 					
 				} catch (Exception de) {
 					JOptionPane.showMessageDialog((Component) null,
@@ -1097,9 +1089,33 @@ public class LibraryApplet extends JApplet {
 		
 		
 		
+		
+		
 	}
 	public void SetLoginCustomer(String s)
 	{
 		loggedInCust = s;
 	}
+	
+	//added
+		// source: http://stackoverflow.com/questions/14142932/gui-with-java-gui-builder-for-uploading-an-image-and-displaying-to-a-panelinsid
+			public static BufferedImage scaleImage(int w, int h, BufferedImage img) throws Exception {
+			    BufferedImage bi;
+			    bi = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
+			    Graphics2D g2d = (Graphics2D) bi.createGraphics();
+			    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			    g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+			    g2d.drawImage(img, 0, 0, w, h, null);
+			    g2d.dispose();
+			    return bi;
+			}
+			//end add
+			
+			public static int getCurrentID(){
+				return currentID;
+			}
+			
+			public static void currentIDPlus(){
+				currentID++;
+			}
 }
