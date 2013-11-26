@@ -192,7 +192,7 @@ public class LibraryApplet extends JApplet {
 		b3.setBounds(10, 80, 120, 25);
 		jp2.add(b3);
 
-		b4 = new JButton("View All Book's");
+		b4 = new JButton("View All Books");
 		b4.setBounds(10, 115, 120, 25);
 		jp2.add(b4);
 
@@ -377,6 +377,99 @@ public class LibraryApplet extends JApplet {
 			
 		});
 		
+		b8.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+			int listIndex, arrayIndex, i, customerCount, deleteSuccess;
+			String removeCustName, firstLastName;
+			arrayIndex = 0;
+			customerCount = 0;
+			deleteSuccess = 0;
+
+			try {
+				if (ml1.getText() != null) {
+						listIndex = list1.getSelectedIndex();
+						removeCustName = (String) mo1.getElementAt(listIndex);
+
+						mo1.removeAllElements();
+						mo2.removeAllElements();
+						mo3.removeAllElements();
+						mo4.removeAllElements();
+						mo5.removeAllElements();
+						mo6.removeAllElements();
+
+						for(i = 0; i < userIDs.size(); i++) {
+							if(userIDs.get(i).equals(removeCustName)) {
+								arrayIndex = i;
+							}
+						}
+
+						try{
+							//con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");.
+							Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
+
+							removeStatement = (PreparedStatement) con.prepareStatement("DELETE FROM users WHERE ID = ? ");
+
+							removeStatement.setString(1, (String) userIDs.get(arrayIndex));
+
+							deleteSuccess = removeStatement.executeUpdate();
+
+						}
+						catch (SQLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						
+						System.out.println("1");
+						
+						userIDs.remove(arrayIndex);
+						userFirstNames.remove(arrayIndex);
+						System.out.println("4");
+						userLastNames.remove(arrayIndex);
+						System.out.println("5");
+						regDates.remove(arrayIndex);
+						System.out.println("6");
+			
+						System.out.println("7");
+						//issueDates.remove(arrayIndex);
+						
+						
+						//returnDates.remove(arrayIndex);
+						//fix***
+						//custIDs.remove(arrayIndex);
+						//fix
+						//bookNames.remove(arrayIndex);
+						
+						
+						System.out.println("2");
+						for(i = 0; i < userIDs.size(); i++) {
+							mo1.addElement(userIDs.get(i));
+							firstLastName = userFirstNames.get(i) + " " + userLastNames.get(i);
+							mo2.addElement(firstLastName);
+							mo3.addElement(regDates.get(i));
+							customerCount++;
+
+							for(int j = 0; j < custIDs.size(); j++) {
+								if(custIDs.get(j).equals(userIDs.get(i))) {
+									mo4.addElement(bookNames.get(j));
+									mo5.addElement(issueDates.get(j));
+									mo6.addElement(returnDates.get(j));
+								}
+
+							}
+						}
+						System.out.println("3");
+						b_no.setText("Total Customers = " + customerCount + " Customers");
+				}
+			}
+			catch (Exception fr) {
+				System.out.println("Exception");
+			}
+
+			}
+		});
+
+		
 		b10.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -522,6 +615,7 @@ public class LibraryApplet extends JApplet {
 		b6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String firstLastName;
+				int customerCount = 0;
 				boolean match;
 				match = false;
 				try {
@@ -551,6 +645,7 @@ public class LibraryApplet extends JApplet {
 						
 						for(int j = 0; j < custIDs.size(); j++)
 						{
+							customerCount++;
 							if(custIDs.get(j).equals(userIDs.get(i)))
 							{
 								match = true;
@@ -568,6 +663,7 @@ public class LibraryApplet extends JApplet {
 							mo5.addElement(" ");
 							mo6.addElement(" ");
 						}
+						b_no.setText("Total Customers = " + customerCount + " Customers");
 					}
 				} catch (Exception ser) {
 					System.out.println(ser);
@@ -758,9 +854,20 @@ public class LibraryApplet extends JApplet {
 				arrayIndex = 0;
 				bookCount = 0;
 				deleteSuccess = 0;
+				/*
+				int ad = list1.getSelectedIndex();
+				String str34 = (String) mo1.getElementAt(ad);
+				
+				for(int index = 0; index < bookNames.size(); index++) {
+					if(bookNames.get(index).equals(str34)) {
+						AddBookApplet.deleteImage(index);
+					}
+				}
+				*/
+
 				
 				try {
-					if (ml1.getText().equals("Book's Name"))
+					if (ml1.getText() != null)
 					{
 						listIndex = list1.getSelectedIndex();
 						removeBookName = (String) mo1.getElementAt(listIndex);
@@ -771,6 +878,7 @@ public class LibraryApplet extends JApplet {
 						mo4.removeAllElements();
 						mo5.removeAllElements();
 						mo6.removeAllElements();
+
 						
 						for(i = 0; i < bookNames.size(); i++)
 						{
@@ -816,7 +924,7 @@ public class LibraryApplet extends JApplet {
 							mo6.addElement(custIDs.get(i));
 							bookCount++;
 						}
-						b_no.setText("Total Books = " + bookCount + " (Book's)");
+						b_no.setText("Total Books = " + bookCount + " (Books)");
 					}
 				} catch (Exception fr) {
 				}
@@ -838,36 +946,33 @@ public class LibraryApplet extends JApplet {
 					JTextArea ak47 = new JTextArea();
 					ak47.setEditable(false);
 					ak47.setText("Book Details"
-							+ "\n"
 							+ "\n");
 					ak47.setBounds(10, 10, 250, 250);
 					jf55.add(ak47);
 					
-					/*
+					
 					//added
 					boolean bookFound = false;
-					if (!t1.getText().equals("")) {
-						
-						for(int i = 0; i < bookNames.size(); i++)
-						{
-							if(bookNames.get(i).equals(str34))
-							{
-								mo1.addElement(bookNames.get(i));
-								mo2.addElement(authors.get(i));
-								mo3.addElement(publications.get(i));
-								mo4.addElement(issueDates.get(i));
-								mo5.addElement(returnDates.get(i));
-								mo6.addElement((String)custIDs.get(i));
-								bookFound = true;
-								bookCount++;
-							}
-						}
-						if(bookFound)
-							b_no.setText("Total Books = " + bookCount + " (Book's)");
-						else
-							b_no.setText("Book not found.");
 					
-					//end add */
+					for(int i = 0; i < bookNames.size(); i++) {
+						if(bookNames.get(i).equals(str34)) {
+							ak47.setText(ak47.getText() + "\n" + "Book Name: " + bookNames.get(i));
+							ak47.setText(ak47.getText() + "\n" + "Book Author: " + authors.get(i));
+							ak47.setText(ak47.getText() + "\n" + "Book Publication:  " + publications.get(i));
+							ak47.setText(ak47.getText() + "\n" + "Issue Date: " + issueDates.get(i));
+							ak47.setText(ak47.getText() + "\n" + "Return Date: " + returnDates.get(i));
+							ak47.setText(ak47.getText() + "\n" + "Cust. Id: " + custIDs.get(i));
+							
+							/*
+							JLabel temp = AddBookApplet.getImage(i);
+							jf55.add(temp);
+							*/
+							bookFound = true;
+						}
+					}
+					
+					
+					//end add 
 
 					Button b1 = new Button("Ok");
 					b1.setBounds(80, 270, 100, 25);
@@ -878,8 +983,10 @@ public class LibraryApplet extends JApplet {
 						}
 					});
 
-					jf55.setSize(285, 335);
+					// bounds of book details screen
+					jf55.setSize(300, 335);
 
+					/*
 					rd2 = new FileReader("Database/pointer.mmm");
 					jt2 = new JTextField();
 					jt2.read(rd2, null);
@@ -964,7 +1071,8 @@ public class LibraryApplet extends JApplet {
 							}
 						}
 					}
-
+					*/
+					
 				} catch (Exception de) {
 					JOptionPane.showMessageDialog((Component) null,
 							"Please Select Book Name from List",
