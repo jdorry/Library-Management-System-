@@ -53,6 +53,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+
 //added by Zach, for the pdf viewer.
 import org.jpedal.examples.viewer.Viewer;
 import org.jpedal.examples.viewer.gui.SwingGUI;
@@ -72,7 +73,7 @@ public class LibraryApplet extends JApplet {
 	int find, bf = 0, bs = 0, bk = 0;
 	JProgressBar progress1;
 	FileReader rd1,rd2;
-	JFrame frame, jf55;
+	JFrame frame, jf55, jf56;
 	private Connection con;
 	private PreparedStatement statement, removeStatement;
 	private ResultSet result;
@@ -95,7 +96,6 @@ public class LibraryApplet extends JApplet {
 	private int bookCount;
 	private String pdfDirect;
 	private String imageDirect;
-	private static int currentID = 0000;
 	
 	/**
 	 * Create the applet.
@@ -122,6 +122,7 @@ public class LibraryApplet extends JApplet {
 		
 		panel = new JPanel();
 		Color gold = new Color(255, 179, 16);
+		
 		panel.setBackground(gold);
 		getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
@@ -129,6 +130,7 @@ public class LibraryApplet extends JApplet {
 		
 		Color re = new Color(122, 145, 201);
 		Color r = new Color(98, 188, 210);
+		
 		Color m = new Color(153, 0, 51);
 		int h = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS;
 		int v = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS;
@@ -321,7 +323,6 @@ public class LibraryApplet extends JApplet {
 			
 			result = statement.executeQuery();
 			
-			currentID = 0000;
 			while (result.next())
 			{
 				usernames.add(result.getString(1));
@@ -330,7 +331,6 @@ public class LibraryApplet extends JApplet {
 				userFirstNames.add(result.getString(3));
 				userLastNames.add(result.getString(4));
 				regDates.add(result.getString(6));
-				currentID++;
 			}
 			statement.close();
 			con.close();
@@ -445,6 +445,23 @@ public class LibraryApplet extends JApplet {
 							removeStatement.setString(6, (String) regDates.get(arrayIndex));
 
 							deleteSuccess = removeStatement.executeUpdate();
+							
+							try{
+								String dash = "-";
+								String sql = "UPDATE LibraryDB SET issuedate ='" + dash +
+										"' , rturndate ='"+ dash +
+										"' , custid ='"+ dash +
+										"' WHERE custid ='" + removeCustID + "'";
+								PreparedStatement updateBook = (PreparedStatement) con.prepareStatement(sql);
+								updateBook.executeUpdate();
+								
+								issueDates.set(arrayIndex, dash);
+								returnDates.set(arrayIndex, dash);
+								custIDs.set(arrayIndex, dash);
+							}
+							catch(SQLException e2){
+								
+							}
 
 						}
 						catch (SQLException e1) {
@@ -702,11 +719,69 @@ public class LibraryApplet extends JApplet {
 		b9.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
+					int ad = list1.getSelectedIndex();
+					String str34 = (String) mo1.getElementAt(ad);
+
+					jf56 = new JFrame("Customer Details");
+					jf56.setVisible(true);
+					jf56.setLayout(null);
+					jf56.setLocation(160, 180);
+
+					JTextArea ak47 = new JTextArea();
+					ak47.setEditable(false);
+					ak47.setText("Customer Details"
+							+ "\n");
+					ak47.setBounds(10, 10, 250, 250);
+					jf56.add(ak47);
+					
+					for(int i = 0; i < userIDs.size(); i++) {
+						if(userIDs.get(i).equals(str34)) {
+							ak47.setText(ak47.getText() + "\n" + " Username: " + usernames.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Password: " + passwords.get(i));
+							ak47.setText(ak47.getText() + "\n" + " First Name:  " + userFirstNames.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Last Name: " + userLastNames.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Cust. ID: " + userIDs.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Reg. Date: " + regDates.get(i));
+						}
+					}
+					
+
+					Button b1 = new Button("Ok");
+					b1.setBounds(30, 270, 100, 25);
+					jf56.add(b1);
+					b1.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							jf56.setVisible(false);
+						}
+					});
+
+					// bounds of customer details screen
+					jf56.setSize(270, 325);
+					
+				} catch (Exception de) {
+					JOptionPane.showMessageDialog((Component) null,
+							"Please Select Customer ID from List",
+							"Library Management(Pravin Rane)",
+							JOptionPane.OK_OPTION);
+				}
+
+			}
+		});
+
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			/*public void actionPerformed(ActionEvent e) {
+				try {
 
 					int ad = list1.getSelectedIndex();
 					String str = (String) mo1.getElementAt(ad);
-
-					System.out.println(str);
 
 					cust_detail d = new cust_detail(str);
 					d.setVisible(true);
@@ -728,12 +803,12 @@ public class LibraryApplet extends JApplet {
 						ml5.setText("Purchase Date");
 						ml6.setText("Returned");
 						*/
-						mo1.removeAllElements();
-						mo2.removeAllElements();
-						mo3.removeAllElements();
-						mo4.removeAllElements();
-						mo5.removeAllElements();
-						mo6.removeAllElements();
+						//mo1.removeAllElements();
+						//mo2.removeAllElements();
+						//mo3.removeAllElements();
+						//mo4.removeAllElements();
+						//mo5.removeAllElements();
+						//mo6.removeAllElements();
 						
 						
 						/*
@@ -796,7 +871,7 @@ public class LibraryApplet extends JApplet {
 								mo6.addElement(jt2.getText() + "   _");
 							}
 							rd2.close();
-						}*/
+						}
 						
 					}
 					catch (Exception fg) {
@@ -804,8 +879,8 @@ public class LibraryApplet extends JApplet {
 					}
 				}
 
-			}
-		});
+			}*/
+		
 
 		b7.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -937,8 +1012,8 @@ public class LibraryApplet extends JApplet {
 							removeStatement.setString(4, (String) issueDates.get(arrayIndex));
 							removeStatement.setString(5, (String) returnDates.get(arrayIndex));
 							removeStatement.setString(6, (String) custIDs.get(arrayIndex));
-							removeStatement.setString(6, (String) images.get(arrayIndex));
-							removeStatement.setString(6, (String) pdfs.get(arrayIndex));
+							removeStatement.setString(7, (String) images.get(arrayIndex));
+							removeStatement.setString(8, (String) pdfs.get(arrayIndex));
 							
 							deleteSuccess = removeStatement.executeUpdate();
 						} catch (SQLException e1) {
@@ -979,7 +1054,6 @@ public class LibraryApplet extends JApplet {
 					String str34 = (String) mo1.getElementAt(ad);
 
 					jf55 = new JFrame("Book Details");
-					jf55.setVisible(true);
 					jf55.setLayout(null);
 					jf55.setLocation(160, 180);
 
@@ -997,12 +1071,12 @@ public class LibraryApplet extends JApplet {
 					
 					for(int i = 0; i < bookNames.size(); i++) {
 						if(bookNames.get(i).equals(str34)) {
-							ak47.setText(ak47.getText() + "\n" + "Title: " + bookNames.get(i));
-							ak47.setText(ak47.getText() + "\n" + "Author: " + authors.get(i));
-							ak47.setText(ak47.getText() + "\n" + "Publication:  " + publications.get(i));
-							ak47.setText(ak47.getText() + "\n" + "Issue Date: " + issueDates.get(i));
-							ak47.setText(ak47.getText() + "\n" + "Return Date: " + returnDates.get(i));
-							ak47.setText(ak47.getText() + "\n" + "Cust. ID: " + custIDs.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Title: " + bookNames.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Author: " + authors.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Publication:  " + publications.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Issue Date: " + issueDates.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Return Date: " + returnDates.get(i));
+							ak47.setText(ak47.getText() + "\n" + " Cust. ID: " + custIDs.get(i));
 							imageDirect = (String) images.get(i);
 							pdfDirect = (String) pdfs.get(i);
 
@@ -1028,8 +1102,7 @@ public class LibraryApplet extends JApplet {
 								}
 							}
 							
-							
-							bookFound = true;
+							break;
 						}
 					}
 					
@@ -1061,9 +1134,12 @@ public class LibraryApplet extends JApplet {
 							jf55.setVisible(false);
 						}
 					});
+					
 
 					// bounds of book details screen
-					jf55.setSize(420, 340);
+					jf55.setSize(420, 325);
+					
+					jf55.setVisible(true);
 					
 				} catch (Exception de) {
 					JOptionPane.showMessageDialog((Component) null,
@@ -1110,12 +1186,4 @@ public class LibraryApplet extends JApplet {
 			    return bi;
 			}
 			//end add
-			
-			public static int getCurrentID(){
-				return currentID;
-			}
-			
-			public static void currentIDPlus(){
-				currentID++;
-			}
 }

@@ -3,6 +3,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -23,6 +24,8 @@ import javax.swing.JButton;
 import com.mysql.jdbc.PreparedStatement;
 import com.mysql.jdbc.Statement;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -102,6 +105,7 @@ public class AddBookApplet extends JApplet {
 				
 		t6 = new JTextField();
 		t6.setBounds(120, 142, 133, 20);
+		t6.setEditable(false);
 		panel.add(t6);
 				
 		// ***l7 => Cover Image****
@@ -130,6 +134,7 @@ public class AddBookApplet extends JApplet {
 		t4 = new JTextField();
 		t4.setColumns(10);
 		t4.setBounds(120, 182, 133, 20);
+		t4.setEditable(false);
 		panel.add(t4);
 		t4.setText("");
 		
@@ -157,7 +162,13 @@ public class AddBookApplet extends JApplet {
 		
 		b1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				if(t1.getText() == null || t1.getText().equals("")){
+					JOptionPane.showMessageDialog((Component) null,
+							"Book Must Have a Title",
+							"Library Management(Pravin Rane)",
+							JOptionPane.OK_OPTION);
+				}
+				else{
 				try {
 					bookname = t1.getText();
 					author = t2.getText();
@@ -215,6 +226,7 @@ public class AddBookApplet extends JApplet {
 					
 				} catch (Exception gr) {
 				}
+				}
 			}
 		});
 
@@ -243,17 +255,32 @@ public class AddBookApplet extends JApplet {
 		// source: http://stackoverflow.com/questions/14142932/gui-with-java-gui-builder-for-uploading-an-image-and-displaying-to-a-panelinsid
 		b4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.showOpenDialog(null);
-				f = chooser.getSelectedFile();
-				String filename = f.getAbsolutePath();
-				t6.setText(filename);
-				try {
-					ImageIcon ii=new ImageIcon(scaleImage(140, 215, ImageIO.read(new File(f.getAbsolutePath()))));
-					l7.setIcon(ii);
-					l6.setVisible(true);
-				} catch (Exception ex) {
-					ex.printStackTrace();
+				while(true){	
+					JFileChooser chooser = new JFileChooser();
+					chooser.showOpenDialog(null);
+					f = chooser.getSelectedFile();
+					if(f != null){
+						String filename = f.getAbsolutePath();
+						if(filename.endsWith(".jpg")){
+							t6.setText(filename);
+							try {
+								ImageIcon ii=new ImageIcon(scaleImage(140, 215, ImageIO.read(new File(f.getAbsolutePath()))));
+								l7.setIcon(ii);
+								l6.setForeground(Color.BLACK);
+								l6.setText("Image Preview: ");
+								l6.setVisible(true);
+								break;
+							} catch (Exception ex) {
+								
+							}
+						}
+						else{
+							l6.setForeground(Color.RED);
+							l6.setText("Must be .jpg File");
+							l6.setVisible(true);
+						}
+					}
+					break;
 				}
 			}
 		});
@@ -263,11 +290,29 @@ public class AddBookApplet extends JApplet {
 		//this name is used by the pdfviewer to display the file.
 		b5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.showOpenDialog(null);
-				f1 = chooser.getSelectedFile();
-				String filename = f1.getAbsolutePath();
-				t4.setText(filename);
+				if(f1 != null){
+					String filename = f1.getAbsolutePath();
+					t4.setText(filename);
+				}
+				while(true){	
+					JFileChooser chooser = new JFileChooser();
+					chooser.showOpenDialog(null);
+					f1 = chooser.getSelectedFile();
+					if(f1 != null){
+						String filename = f1.getAbsolutePath();
+						if(filename.endsWith(".pdf")){
+							t4.setText(filename);
+							l6.setVisible(false);
+							break;
+						}
+						else{
+							l6.setForeground(Color.RED);
+							l6.setText("Must be .pdf File");
+							l6.setVisible(true);
+						}
+					}
+					break;
+				}
 			}
 		});
 

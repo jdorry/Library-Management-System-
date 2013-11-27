@@ -11,13 +11,17 @@ import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 import javax.swing.JButton;
 
 import com.mysql.jdbc.PreparedStatement;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
@@ -29,12 +33,18 @@ public class AddCustApplet extends JApplet {
 	JTextField t1, t2, t3, t4, t5, t6, t21, t51, t52, user, pass;
 	JTextArea textArea;
 	JButton registerButton, resetButton, cancelButton;
-	JLabel l1, l2, l3, l4, l5, l6, l7, l21, l51, l52, userLabel, passLabel;
+	JLabel l1, l2, l3, l4, l5, l6, l7, l21, l51, l52, userLabel, passLabel, info;
 	JPanel panel;
 	FileReader rd1;
 	JTextField read1;
 	FileWriter wr1;
 	String year = "20";
+	
+	private ResultSet result;
+	private PreparedStatement statement;
+	private Connection con;
+	
+	private ArrayList userIDs = new ArrayList();
 	
 	private JTextField textField;
 	private JTextField textField_1;
@@ -43,6 +53,27 @@ public class AddCustApplet extends JApplet {
 	private JTextField textField_4;
 	
 	public AddCustApplet() {
+		
+		try {
+			//con = (Connection) DriverManager.getConnection("jdbc:mysql://sql3.freemysqlhosting.net:3306/sql322429", "sql322429", "xK5*kT6!");
+			con = (Connection) DriverManager.getConnection("jdbc:mysql://dbinstance.cdet1nwidztk.us-west-2.rds.amazonaws.com:3306/ClassCalc", "john", "R17A2FZa");
+			//con = (Connection) DriverManager.getConnection("jdbc:mysql://gorcruxcom.ipagemysql.com:3306/lmsdatabase", "tyler", "Ambition8143");
+			statement = (PreparedStatement) con.prepareStatement("SELECT * FROM `users`");
+			result = statement.executeQuery();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			while (result.next())
+			{
+				userIDs.add(result.getString(5));
+			}
+			statement.close();
+			con.close();
+		} catch (Exception derp) {
+			System.out.println("error");
+		}
 		
 		panel = new JPanel();
 		panel.setBackground(SystemColor.activeCaptionBorder);
@@ -72,7 +103,7 @@ public class AddCustApplet extends JApplet {
 				year = year + str.charAt(i);
 			}
 		}
-		String issue = mon + "/" + date + "/" + year;
+		String issue = mon + "/" + date + "/" + 13;
 		
 		l1 = new JLabel("Customer ID");
 		l1.setFont(new Font("Tahoma", Font.PLAIN, 12));
@@ -81,17 +112,23 @@ public class AddCustApplet extends JApplet {
 		
 		t1 = new JTextField();
 		t1.setBounds(119, 132, 133, 20);
-		int intID = LibraryApplet.getCurrentID();
-		String stringID = Integer.toString(intID);
-		if(intID < 10){
-			stringID = "000" + stringID;
+
+		String stringID = Integer.toString(randGen());
+		
+		boolean finished = false;
+		// fix
+		while(!finished){
+			for(int i = 0; i < userIDs.size(); i++){
+				if(userIDs.get(i).equals(stringID)){
+					stringID = Integer.toString(randGen());
+					break;
+				}
+				if((userIDs.size()-1) == i){
+					finished = true;
+				}
+			}
 		}
-		else if(intID > 9 && intID < 100){
-			stringID = "00" + stringID;
-		}
-		else if(intID > 99 && intID < 1000){
-			stringID = "0" + stringID;
-		}
+		
 		t1.setText(stringID);
 		t1.setEditable(false);
 		panel.add(t1);
@@ -189,7 +226,6 @@ public class AddCustApplet extends JApplet {
 						statement.close();
 						con.close();		
 						
-						LibraryApplet.currentIDPlus();
 						
 						LibraryApplet library = new LibraryApplet();
 						library.init();
@@ -197,6 +233,16 @@ public class AddCustApplet extends JApplet {
 						panel.setVisible(false);
 						setLayout(new BorderLayout(800, 600));
 						add("Center", library);
+						//LibraryApplet.currentIDPlus();
+					}
+					else{
+						info = new JLabel("Please Enter Username and Password");
+						info.setFont(new Font("Tahoma", Font.PLAIN, 12));
+						info.setBounds(10, 230, 220, 25);
+						info.setForeground(Color.RED);
+						panel.add(info);
+						repaint();
+						
 					}
 					
 				} catch (Exception gr) {
@@ -206,6 +252,7 @@ public class AddCustApplet extends JApplet {
 
 		resetButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				info.setVisible(false);
 				t2.setText("");
 				user.setText("");
 				pass.setText("");
@@ -226,6 +273,9 @@ public class AddCustApplet extends JApplet {
 
 	}
 	
-
+	private int randGen() {
+	    Random r = new Random();
+	    return ((1 + r.nextInt(2)) * 1000 + r.nextInt(1000));
+	}
 
 }

@@ -99,7 +99,7 @@ public class Login extends JApplet {
 			while (result.next()){
 				usernames.add(result.getString(1));
 				passwords.add(result.getString(2));
-				ids.add(result.getString(6));
+				ids.add(result.getString(5));
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -136,6 +136,7 @@ public class Login extends JApplet {
 				else if(userMatch)
 				{
 					CustLibraryView library = new CustLibraryView();
+					library.SetLoginCustomer(userID);
 					library.init();
 					library.start();
 					panel.setVisible(false);
